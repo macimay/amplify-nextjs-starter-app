@@ -1,0 +1,31 @@
+{
+  "Index": {
+    "title": "你好世界"
+  },
+  "Navigation": {
+    "workspace": "工作区",
+    "team": "团队"
+  },
+  "Footer": {
+    "productTitle": "产品&服务"
+  },
+  "HomePage": {
+    "subTitle": "AI绘画",
+    "title": "团丢协作，边画图边讨论",
+    "titlePrompt": "提出需求，无限发挥想象力，AI来帮你画出优秀作品",
+    "startTrial": "直接试用",
+    "featuresTitle": "AI绘画",
+    "featuresSubTitle": "释放想象力，AI来帮你画",
+    "featuresDescription": "工作美术协同，集思绘图，高效工作。",
+    "featuresList1Title": "灵感提取",
+    "featuresList1Subtitle": "输入详细的文字描述完成创作",
+    "featuresList2Title": "不同风格模型",
+    "featuresList2Subtitle": "多种风格类型画面自由选择。",
+    "featuresList3Title": "精确灵感绘画",
+    "featuresList3Subtitle": "你脑中的画面，AI帮你画出来。",
+    "featuresUserReviewTitle": "用户评价",
+    "subscriptionTitle": "订阅",
+    "subscriptionSubtitle": "享受优惠折扣",
+    "subscriptionStartButton": "去订阅"
+  }
+}

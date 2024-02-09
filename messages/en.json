@@ -1,0 +1,31 @@
+{
+  "Index": {
+    "title": "Hello world!"
+  },
+  "Navigation": {
+    "workspace": "Workspace",
+    "team": "Team"
+  },
+  "Footer": {
+    "productTitle": "Product"
+  },
+  "HomePage": {
+    "subTitle": "AI Drawing",
+    "title": "Collaborative Drawing",
+    "titlePrompt": "Submit requirements, unleash your imagination, and let AI help you create excellent works",
+    "startTrial": "Start Now",
+    "featuresTitle": "AI DRAWING",
+    "featuresSubTitle": "Unleash your imagination, let AI help you draw",
+    "featuresDescription": "Artistic collaboration at work, brainstorming through drawing, efficiency in action.",
+    "featuresList1Title": "Inspiration Extraction",
+    "featuresList1Subtitle": "Enter a detailed text description to complete the creation",
+    "featuresList2Title": "Different style models",
+    "featuresList2Subtitle": "Freely choose from a variety of style types.",
+    "featuresList3Title": "Precise Inspiration Drawing",
+    "featuresList3Subtitle": "The image in your mind, AI helps you draw it out.",
+    "featuresUserReviewTitle": "Review",
+    "subscriptionTitle": "Subscription",
+    "subscriptionSubtitle": "Enjoy discount",
+    "subscriptionStartButton": "Subscription"
+  }
+}
