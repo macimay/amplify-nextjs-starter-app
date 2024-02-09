@@ -44,7 +44,7 @@ console.log("before Amplify configure");
 //   },
 //   { Auth: { tokenProvider: cognitoUserPoolsTokenProvider } }
 // );
-Amplify.configure(awsConfig, { ssr: true });
+Amplify.configure(awsConfig);
 
 function RootLayout({
   children,
