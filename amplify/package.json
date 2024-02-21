@@ -1,3 +1,26 @@
 {
-  "type": "module"
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": true
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.133",
+    "node-fetch": "^3.3.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@aws-sdk/protocol-http": "^3.374.0",
+    "aws-appsync": "^4.1.10",
+    "graphql": "^14.7.0",
+    "graphql-tag": "^2.12.6"
+  }
 }

@@ -1,18 +1,36 @@
 "use client";
 
 import "@aws-amplify/ui-react/styles.css";
-import { Authenticator, withAuthenticator } from "@aws-amplify/ui-react";
+import {
+  Authenticator,
+  useAuthenticator,
+  withAuthenticator,
+} from "@aws-amplify/ui-react";
 
-function Login() {
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Amplify } from "aws-amplify";
+import { Hub } from "aws-amplify/utils";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const { route } = useAuthenticator((context) => [context.route]);
+
+  useEffect(() => {
+    Hub.listen("auth", (data) => {
+      console.log("A new auth event has happened: ", data.payload.event);
+      if (data?.payload?.event === "signedIn") {
+        router.replace("/dashboard/loading");
+      }
+    });
+  }, []);
+
   return (
-    <main>
-      <h1>Hello login </h1>
-      <button> Sign out</button>
-      <div className="flex mr-10 mt-10 bg-red-500 justify-end">
+    <>
+      <div className="flex justify-end">
         <Authenticator></Authenticator>
       </div>
-    </main>
+    </>
   );
 }
 // export default withAuthenticator(Login);
-export default Login;

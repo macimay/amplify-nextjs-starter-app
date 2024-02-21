@@ -1,4 +1,4 @@
-import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
+import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -8,11 +8,48 @@ specify that owners, authenticated via your Auth resource can "create",
 authenticated via an API key, can only "read" records.
 =========================================================================*/
 const schema = a.schema({
-  Todo: a
+  TeamType: a.enum(["TEAM", "PERSONAL"]),
+  UserStatus: a.enum(["ACTIVE", "SUSPEND", "CLOSED"]),
+  User: a
     .model({
-      content: a.string(),
+      cognitoId: a.string().required(),
+      username: a.string().required(),
+      avatar: a.string(),
+      status: a.ref("UserStatus").required(),
     })
-    .authorization([a.allow.owner(), a.allow.public().to(['read'])]),
+    .authorization([
+      a.allow.public().to(["read", "create", "delete", "update"]),
+    ]),
+
+  Team: a
+    .model({
+      name: a.string().required(),
+      admin: a.hasOne("User").required(),
+      members: a.hasMany("User").arrayRequired(),
+    })
+    .authorization([
+      a.allow.public().to(["read", "create", "delete", "update"]),
+    ]),
+
+  InviteCode: a
+    .model({
+      code: a.string().required(),
+      team: a.hasOne("Team").required(),
+      used: a.boolean().default(false),
+      createAt: a.datetime().required(),
+    })
+    .authorization([
+      a.allow.public().to(["read", "create", "delete", "update"]),
+    ]),
+
+  UserSession: a
+    .model({
+      user: a.hasOne("User").required(),
+      team: a.hasOne("Team").required(),
+      start: a.datetime().required(),
+      ip: a.string().required(),
+    })
+    .authorization([a.allow.public().to(["read", "create"])]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -20,11 +57,17 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: 'apiKey',
+    defaultAuthorizationMode: "apiKey",
     // API Key is used for a.allow.public() rules
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
+
+    // IAM is used for a.allow.owner() rules
+  },
+  functions: {
+    // define a function that can be used in your schema
+    // @see https://docs.amplify.aws/gen2/build-a-backend/function
   },
 });
 

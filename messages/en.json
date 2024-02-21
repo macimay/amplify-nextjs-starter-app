@@ -4,7 +4,9 @@
   },
   "Navigation": {
     "workspace": "Workspace",
-    "team": "Team"
+    "team": "Team",
+    "signOut": "Sign Out",
+    "profile": "Profile"
   },
   "Footer": {
     "productTitle": "Product"
@@ -27,5 +29,30 @@
     "subscriptionTitle": "Subscription",
     "subscriptionSubtitle": "Enjoy discount",
     "subscriptionStartButton": "Subscription"
+  },
+  "Team": {
+    "menuMain": "Main",
+    "menuMember": "Members",
+    "menuSetting": "Settings",
+    "memberInvite": "invite Member",
+    "memberInviteTitle": "You can invite your colleagues to create with you."
+  },
+  "Loading": {
+    "WelcomeFreshNew": "Thanks for choosing us,please Wait a moment, we are loading the freshest and newest content for you.",
+    "Initializing": "Initializing..."
+  },
+  "Welcome": {
+    "enterpriseTitle": "Enterprise",
+    "enterpriseDescription": "I am a corporate administrator, I need to create a corporation and invite members to join",
+
+    "personalTitle": "Personal",
+    "personalDescription": "I am a personal user, I need to create a personal account and join the corporation",
+
+    "inviteTitle": "Invite",
+    "inviteDescription": "I have received an invitation, I need to join the corporation",
+    "inviteInputPrompt": "Please enter the invitation code",
+
+    "TeamTitle": "Welcome to create Team",
+    "TeamInputPrompt": "Please enter the team name"
   }
 }

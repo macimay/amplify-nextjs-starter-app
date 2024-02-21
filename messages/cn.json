@@ -4,7 +4,9 @@
   },
   "Navigation": {
     "workspace": "工作区",
-    "team": "团队"
+    "team": "团队",
+    "signOut": "退出账号",
+    "profile": "个人设置"
   },
   "Footer": {
     "productTitle": "产品&服务"
@@ -27,5 +29,29 @@
     "subscriptionTitle": "订阅",
     "subscriptionSubtitle": "享受优惠折扣",
     "subscriptionStartButton": "去订阅"
+  },
+  "Team": {
+    "menuMain": "团队",
+    "menuMember": "成员",
+    "menuSetting": "设置",
+    "memberInviteTitle": "你可以邀请您的同事和您一起创作",
+    "memberInvite": "邀请成员"
+  },
+  "Loading": {
+    "WelcomeFreshNew": "谢谢您选择WeDraw,为了方便您尽快使用，请稍等片刻",
+    "Initializing": "正在初始化..."
+  },
+  "Welcome": {
+    "enterpriseTitle": "创建公司/企业",
+    "enterpriseDescription": "我的工作场景是公司，我需要协作以及其他企业专属功能",
+
+    "personalTitle": "个人直接使用",
+    "personalDescription": "我的工作场景是个人，我不需要企业相关服务",
+
+    "inviteTitle": "我受邀而来，我希望输入邀请码",
+    "inviteDescription": "我收到了加入企业的邀请码，我需要加入企业",
+    "inviteInputPrompt": "请输入邀请码",
+    "TeamTitle": "置一个有创意的团队名字，开始工作",
+    "TeamInputPrompt": "请输入团队名称"
   }
 }

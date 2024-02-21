@@ -4,6 +4,8 @@ import { locales, localePrefix } from "@/config";
 import { NextRequest, NextResponse } from "next/server";
 
 import { fetchAuthSession } from "aws-amplify/auth/server";
+import { runWithAmplifyServerContext } from "@/server/amplifyServerInit";
+import createIntlMiddleware from "next-intl/middleware";
 
 export default createMiddleware({
   // A list of all locales that are supported
@@ -14,6 +16,36 @@ export default createMiddleware({
   localeDetection: false,
   localePrefix: localePrefix,
 });
+export async function middleware(request: NextRequest) {
+  const handleI18nRouting = createIntlMiddleware({
+    locales: locales,
+    defaultLocale: "en",
+  });
+  const response = handleI18nRouting(request);
+  // const response = NextResponse.next();
+  const authenticated = await runWithAmplifyServerContext({
+    nextServerContext: { request, response },
+    operation: async (contextSpec) => {
+      try {
+        const session = await fetchAuthSession(contextSpec);
+        return session.tokens !== undefined;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    },
+  });
+
+  if (authenticated) {
+    // return NextResponse.redirect(new URL(request.url));
+    return response;
+  } else if (request.nextUrl.pathname.indexOf("login") == -1) {
+    console.log("redirecting to login:", request.nextUrl.pathname);
+
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+  return response;
+}
 // Amplify.configure(amplifyconfig, { ssr: true });
 
 // export function middleware(request: NextRequest) {
@@ -64,7 +96,11 @@ export default createMiddleware({
 
 export const config = {
   // Match only internationalized pathnames
-  matcher: ["/", "/(en|cn)/:path*", "/((?!_next|_vercel|.*\\..*).*)"],
+  matcher: [
+    "/",
+    "/(en|cn)/:path*",
+    "/((?!api|_next/static|_next/image|_vercel|.*\\..*).*)",
+  ],
 };
 // function createIntlCache() {
 //   throw new Error("Function not implemented.");
