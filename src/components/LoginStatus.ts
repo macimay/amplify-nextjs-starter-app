@@ -1,12 +1,7 @@
 class LoginStatus {
   static instance: LoginStatus;
 
-  public isLogin: boolean;
-  public activeTeamId: string;
-  public activeTeamName: string;
-  public userId: string;
-  public userName: string;
-  public sessionId: string;
+  sessionInfo: string;
 
   static getInstance() {
     if (!LoginStatus.instance) {
@@ -15,57 +10,31 @@ class LoginStatus {
     return LoginStatus.instance;
   }
   private constructor() {
-    this.isLogin = false;
-    this.activeTeamId = "";
-    this.activeTeamName = "";
-    this.userId = "";
-    this.userName = "";
-    this.sessionId = "";
+    this.sessionInfo = "";
+  }
+  public update(sessionInfo: string) {
+    console.log("Update loginStatus:", sessionInfo);
+
+    this.sessionInfo = sessionInfo;
+    this.save();
+  }
+  public save() {
+    console.log("Save loginStatus:", this);
+    localStorage.setItem("loginSession", JSON.stringify(this));
   }
 
-  public saveLoginStatus(status: {
-    teamId: string;
-    teamName: string;
-    userId: string;
-    userName: string;
-    sessionId: string;
-  }) {
-    this.isLogin = true;
-    this.activeTeamId = status.teamId;
-    this.activeTeamName = status.teamName;
+  public load() {
+    const loginSession = localStorage.getItem("loginSession");
+    if (loginSession) {
+      console.log("Load loginStatus:", loginSession);
+      const loginStatus = JSON.parse(loginSession);
 
-    this.userId = status.userId;
-    this.userName = status.userName;
-    this.sessionId = status.sessionId;
-
-    if (typeof window! !== "undefined") {
-      console.log("saveLoginStatus:window is defined");
-      localStorage.setItem("loginStatus", JSON.stringify(loginStatus));
-    } else {
-      console.log("saveLoginStatus:window is undefined");
+      this.sessionInfo = loginStatus.sessionInfo;
     }
   }
-  public loadLoginStatus() {
-    if (typeof window !== "undefined") {
-      const status = localStorage.getItem("loginStatus");
-      console.log("loadLoginStatus window is defined:", status);
-      if (status) {
-        const data = JSON.parse(status);
 
-        this.activeTeamId = data.activeTeamId;
-        this.activeTeamName = data.activeTeamName;
-        this.userId = data.userId;
-        this.userName = data.userName;
-        this.sessionId = data.sessionId;
-        this.isLogin = true;
-
-        return true;
-      }
-    } else {
-      console.log("window is undefined");
-
-      return false;
-    }
+  public dump() {
+    console.log("Dump loginStatus:", this);
   }
 }
 export const loginStatus = LoginStatus.getInstance();

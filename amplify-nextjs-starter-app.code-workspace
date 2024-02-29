@@ -1,10 +1,10 @@
 {
   "folders": [
-	{
-		"path": "."
-	}
-],
+    {
+      "path": "."
+    }
+  ],
   "settings": {
-    "cSpell.words": ["amplifyconfiguration", "cognite", "heroicons"]
+    "cSpell.words": ["amplifyconfiguration", "cognite", "heroicons", "Tabbar"]
   }
 }

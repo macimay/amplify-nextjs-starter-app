@@ -1,0 +1,9 @@
+/* SidebarStyles.css */
+.pro-sidebar {
+  background-color: var(
+    --nextui-colors-background
+  ); /* Example of using a NextUI color variable */
+  color: var(--nextui-colors-text); /* Adjust the text color */
+}
+
+/* Continue overriding other styles as needed */

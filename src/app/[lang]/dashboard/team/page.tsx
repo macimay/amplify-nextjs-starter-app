@@ -1,6 +1,6 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
-import UserProfile from "@/components/UserProfile";
+import UserProfile from "@/components/profile/UserProfile";
 import { AuthUser } from "@aws-amplify/auth";
 import dynamic from "next/dynamic";
 import { loginStatus } from "@/components/LoginStatus";
@@ -10,6 +10,8 @@ import { Button, Divider, Link, Snippet } from "@nextui-org/react";
 import { useTranslations } from "next-intl";
 import { generateClient } from "aws-amplify/data";
 import { Schema } from "@/../amplify/data/resource";
+import { requestInviteCode } from "./actions";
+import { useTeamContext } from "@/components/TeamContext";
 
 // Import the 'Auth' module from the 'aws-amplify' package
 
@@ -30,48 +32,35 @@ export default function TeamMembersPage() {
 
   console.log(loginStatus);
 
-  const [code, setCode] = useState("****-****");
-  const [codeStatus, setCodeStatus] = useState({
-    fresh: false,
-    code: "***-***",
-  });
+  const [code, setCode] = useState("xxx");
+  const [refreshCode, setRefresh] = useState(0);
+  const { session } = useTeamContext();
 
   useEffect(() => {
-    const client = generateClient<Schema>();
-    console.log("loginStatus:", loginStatus);
-    client.models.InviteCode.list({
-      filter: {
-        inviteCodeTeamId: { eq: loginStatus.activeTeamId! },
-      },
-      selectionSet: ["code"],
-    }).then((inviteCode) => {
-      if (inviteCode == null) {
-        //create code first
-        console.log("create code first");
+    console.log("load invite code:", session.relation.team.id);
 
-        if (codeStatus.fresh) {
-          client.models.InviteCode.delete({
-            teamId: loginStatus.activeTeamId,
-          });
-        }
-        client.models.InviteCode.create({
-          inviteCodeTeamId: loginStatus.activeTeamId,
-          used: false,
-          code: generateCode(6),
-          createAt: new Date().toISOString(),
-        }).then((inviteCode) => {
-          console.log("inviteCode:", inviteCode);
-          setCode(inviteCode.data.code);
-        });
-      } else {
-        console.log("inviteCode:", inviteCode);
-        setCode(inviteCode.data[0].code);
-      }
-    });
-  }, [codeStatus]);
+    requestInviteCode(session.relation.team.id, false)
+      .then((code) => {
+        console.log("code:", code);
+        setCode(code.code); // Fix: Access the code property of the first element in the array
+      })
+      .catch((err) => {
+        console.log("error:", err);
+      });
+  }, [session]);
+  useEffect(() => {
+    requestInviteCode(session.relation.team.id, false)
+      .then((code) => {
+        console.log("code:", code);
+        setCode(code.code); // Fix: Access the code property of the first element in the array
+      })
+      .catch((err) => {
+        console.log("error:", err);
+      });
+  }, []);
 
   return (
-    <div className="flex flex-col h-screen container">
+    <div className="flex flex-col h-screen container ">
       <div className="adjust-start text-3xl bold">{t("memberInviteTitle")}</div>
       <Divider />
       <div className="flex h-32 justify-center text-4xl">

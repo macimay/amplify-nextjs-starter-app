@@ -27,7 +27,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="flex justify-end">
+      <div className="flex justify-end ">
         <Authenticator></Authenticator>
       </div>
     </>

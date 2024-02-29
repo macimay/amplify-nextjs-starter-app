@@ -15,14 +15,17 @@ import { useState } from "react";
 
 import { TextField } from "@aws-amplify/ui-react";
 import {
-  createUserAndTeam,
-  registerForInvite,
+  createTeam,
+  joinTeamByInvite,
 } from "@/app/[lang]/dashboard/team/actions";
-import { createWriteStream } from "fs";
-import { useFormState } from "react-dom";
 
-import { loginStatus } from "../LoginStatus";
 import { useRouter } from "next/navigation";
+import TeamListComponent from "./TeamListComponent";
+import { useTeamContext } from "./TeamContext";
+import { Schema } from "../../amplify/data/resource";
+import { generateClient } from "aws-amplify/api";
+import { updateSession } from "@/app/[lang]/dashboard/user/action";
+import { getCurrentUser } from "aws-amplify/auth";
 
 export default function WelcomeComponent() {
   const [stage, setState] = useState("Welcome");
@@ -31,6 +34,8 @@ export default function WelcomeComponent() {
 
   const [teamName, setTeamName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+
+  const { setSession } = useTeamContext();
 
   const handleStateChange = (name: string) => {
     setState(name);
@@ -41,17 +46,11 @@ export default function WelcomeComponent() {
     console.log("handleInviteJoin: ", inviteCode);
     setState("Executing");
     try {
-      registerForInvite({ inviteCode: inviteCode }).then((result) => {
-        console.log("registerForInvite result: ", result);
-        loginStatus.saveLoginStatus({
-          userId: result.userId,
-          userName: result.userName,
-          teamId: result.teamId,
-          teamName: result.teamName,
-          sessionId: result.sessionId,
-        });
-        router.push("/dashboard/team");
+      joinTeamByInvite({ inviteCode: inviteCode }).then((teamInfo) => {
+        console.log("registerForInvite result: ", teamInfo);
+        setSession(teamInfo);
       });
+      router.push("/dashboard/team");
     } catch (err) {
       console.log("registerForInvite error: ", err);
     }
@@ -59,25 +58,42 @@ export default function WelcomeComponent() {
   const handleCreateTeam = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const result = await createUserAndTeam({ teamName: teamName });
-    console.log("createUserAndTeam result: ", result);
+    const sessionInfo = await createTeam({ teamName: teamName });
+    console.log("createUserAndTeam result: ", sessionInfo);
 
-    loginStatus.saveLoginStatus({
-      userId: result.userId,
-      userName: result.userName,
-      teamId: result.teamId,
-      teamName: result.teamName,
-      sessionId: result.sessionId,
-    });
+    // loginStatus.updateTeamInfo(teamInfo.teamId, result.teamName);
+    //update usersession
+
+    setSession(sessionInfo);
     router.push("/dashboard/team");
   };
+
   return (
     <>
-      <div className="flex flex-col h-48">
+      <div className="flex flex-col">
         {stage === "Welcome" && (
           <>
             <form onSubmit={handleCreateTeam}>
               <div className="flex flex-col gap-4 w-full h-full justify-between  items-center items-stretch ">
+                <div>
+                  <TeamListComponent
+                    callback={async (selectedTeam: Schema["Team"]) => {
+                      console.log("selectedTeam: ", selectedTeam);
+                      const { userId } = await getCurrentUser();
+                      updateSession({
+                        teamId: selectedTeam.id,
+                        userId: userId,
+                      })
+                        .then((sessionInfo) => {
+                          console.log("updateSession result:", sessionInfo);
+                          // setSession(JSON.parse(sessionInfo!));
+                        })
+                        .catch((err) => {
+                          console.log("updateSession error:", err);
+                        });
+                    }}
+                  />
+                </div>
                 <Card className="h-full">
                   <CardHeader>{t("TeamTitle")}</CardHeader>
                   <CardBody>
@@ -134,4 +150,7 @@ export default function WelcomeComponent() {
       </div>
     </>
   );
+}
+function setSession(sessionInfo: string) {
+  throw new Error("Function not implemented.");
 }

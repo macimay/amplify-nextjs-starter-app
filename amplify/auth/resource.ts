@@ -7,9 +7,9 @@ import { afterSignUp } from "../functions/onUserSignUp/resource.js";
  * When used alongside data, it is automatically configured as an auth provider for data
  * @see https://docs.amplify.aws/gen2/build-a-backend/auth
  */
-let GRAPHQL_ENDPOINT =
-  "https://uuhqf4vk3bhvtoxq46glqcfica.appsync-api.ap-northeast-2.amazonaws.com/graphql";
-let GRAPHQL_X_KEY = "da2-3ny3m2tjhrbkzokgsxohuxxubq";
+// let GRAPHQL_ENDPOINT =
+//   "https://uuhqf4vk3bhvtoxq46glqcfica.appsync-api.ap-northeast-2.amazonaws.com/graphql";
+// let GRAPHQL_X_KEY = "da2-3ny3m2tjhrbkzokgsxohuxxubq";
 export const auth = defineAuth({
   loginWith: {
     email: true,
@@ -56,15 +56,14 @@ export const auth = defineAuth({
     //     key: GRAPHQL_X_KEY,
     //   },
     // }),
-    postConfirmation: defineFunction({
-      name: "postConfirmation",
-      entry: "post-confirmation.ts",
-      environment: {
-        endPoint: GRAPHQL_ENDPOINT,
-        key: GRAPHQL_X_KEY,
-      },
-    }),
-
+    // postConfirmation: defineFunction({
+    //   name: "postConfirmation",
+    //   entry: "post-confirmation.ts",
+    //   environment: {
+    //     endPoint: GRAPHQL_ENDPOINT,
+    //     key: GRAPHQL_X_KEY,
+    //   },
+    // }),
     /** add pre-sign-up lambda trigger */
     // function: defineFunction('preSignUp', 'src/preSignUp.js'),
     // function: defineFunction('preSignUp', 'src/preSignUp.ts'),

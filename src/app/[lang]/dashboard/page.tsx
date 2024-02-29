@@ -10,5 +10,12 @@ export default function Dashboard() {
   //       router.push("/login");
   //     }
   //   }, []);
-  return <div>Dashboard HomePage</div>;
+  return (
+    <div className="flex flex-row w-full h-full">
+      <div className="flex flex-col">
+        <h1>Dashboard</h1>
+        <p>Welcome to the dashboard</p>
+      </div>
+    </div>
+  );
 }

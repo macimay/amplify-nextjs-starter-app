@@ -10,6 +10,8 @@ import ReactDOM from "react-dom";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Amplify } from "aws-amplify";
 import AmplifyInit from "@/components/AmplifyInit";
+import { createContext } from "vm";
+import { TeamWrapper } from "@/components/TeamContext";
 
 // import AuthCheck from "./components/AuthCheck";
 
@@ -34,7 +36,9 @@ function RootLayout({
       <body className={inter.className}>
         <AmplifyInit />
         <NextIntlClientProvider messages={t}>
-          <Providers>{children}</Providers>
+          <Providers>
+            <TeamWrapper>{children}</TeamWrapper>
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>

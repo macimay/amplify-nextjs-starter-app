@@ -11,7 +11,7 @@ import {
 } from "@aws-amplify/ui-react";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { Authenticator } from "@aws-amplify/ui-react";
-import React, { StrictMode } from "react";
+import React, { StrictMode, createContext } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [colorMode, setColorMode] = React.useState<ColorMode>("system");
@@ -25,7 +25,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <NextUIProvider>
       <NextThemesProvider defaultTheme="dark">
         <Authenticator.Provider>
-          <main className="text-foreground bg-background w-full h-full flex flex-col">
+          <main className="text-foreground bg-background w-full h-screen flex flex-col items-center justify-start ">
             {children}
           </main>
         </Authenticator.Provider>

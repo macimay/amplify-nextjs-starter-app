@@ -4,9 +4,15 @@
   },
   "Navigation": {
     "workspace": "Workspace",
-    "team": "Team",
+    "marketplace": "AI model List",
+    "lab": "Practice",
+    "document": "Document",
     "signOut": "Sign Out",
-    "profile": "Profile"
+    "profile": "Profile",
+    "menuMain": "Main",
+    "menuMember": "Members",
+    "menuSetting": "Settings",
+    "menuPrice": "Price"
   },
   "Footer": {
     "productTitle": "Product"
@@ -34,12 +40,14 @@
     "menuMain": "Main",
     "menuMember": "Members",
     "menuSetting": "Settings",
+    "menuPrice": "Price",
     "memberInvite": "invite Member",
     "memberInviteTitle": "You can invite your colleagues to create with you."
   },
   "Loading": {
     "WelcomeFreshNew": "Thanks for choosing us,please Wait a moment, we are loading the freshest and newest content for you.",
-    "Initializing": "Initializing..."
+    "Initializing": "Initializing...",
+    "InitializeUserSession": "Initialize User Session"
   },
   "Welcome": {
     "enterpriseTitle": "Enterprise",
@@ -54,5 +62,41 @@
 
     "TeamTitle": "Welcome to create Team",
     "TeamInputPrompt": "Please enter the team name"
+  },
+  "ProfilePage": {
+    "accountId": "Account ID",
+    "accountName": "Account Name",
+    "aliasName": "Alias Name",
+    "email": "Email",
+    "phone": "Phone",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "save": "Save",
+    "cancel": "Cancel",
+    "changePassword": "Change Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "change": "Change",
+    "changeSuccess": "Change Success",
+    "changeFail": "Change Fail",
+    "changePasswordFail": "Change Password Fail",
+    "changePasswordSuccess": "Change Password Success",
+    "changePasswordError": "Change Password Error",
+    "changePasswordError1": "Old password is incorrect",
+    "changePasswordError2": "New password is inconsistent",
+    "changePasswordError3": "New password is the same as the old password",
+    "changePasswordError4": "New password is too simple",
+    "changePasswordError5": "New password is too long",
+    "changePasswordError6": "New password is too short",
+    "tabPersonal": "Basic",
+    "tabSecurity": "Security",
+    "tabTeam": "Team",
+    "tabBilling": "Billing",
+    "InitializeUserSession": "Initialize User Session",
+    "LabelTeamName": "Team Name",
+    "LabelTeamAlias": "Team Alias",
+    "LabelTeamRole": "Team Role",
+    "LabelTeamTitle": "Team Title"
   }
 }

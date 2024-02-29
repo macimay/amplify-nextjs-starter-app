@@ -1,9 +1,9 @@
 {
   "aws_project_region": "ap-northeast-2",
-  "aws_user_pools_id": "ap-northeast-2_ULkLDrRnf",
+  "aws_user_pools_id": "ap-northeast-2_6Fp2KdpVN",
   "aws_cognito_region": "ap-northeast-2",
-  "aws_user_pools_web_client_id": "7sgb282nv2879ece5785j7t9cl",
-  "aws_cognito_identity_pool_id": "ap-northeast-2:1ac48b99-c8ee-4d64-84d9-564316158d8c",
+  "aws_user_pools_web_client_id": "24qnmua5b9v3b6q9dmqdt2em2p",
+  "aws_cognito_identity_pool_id": "ap-northeast-2:1ca044cc-0b05-434d-b594-090b2746621c",
   "allowUnauthenticatedIdentities": "true",
   "aws_cognito_signup_attributes": [
     "EMAIL",
@@ -24,9 +24,9 @@
       "REQUIRES_SYMBOLS"
     ]
   },
-  "aws_appsync_graphqlEndpoint": "https://rzrsuadwdfedhlt3lszsiroh3u.appsync-api.ap-northeast-2.amazonaws.com/graphql",
+  "aws_appsync_graphqlEndpoint": "https://vzkcri7ntvdcfmr2veamjbc56i.appsync-api.ap-northeast-2.amazonaws.com/graphql",
   "aws_appsync_region": "ap-northeast-2",
-  "aws_appsync_apiKey": "da2-mu4b7gi5h5ap5biqvgdkjn4qki",
+  "aws_appsync_apiKey": "da2-dvlpu5h3zfatbc6vf7hdg5q3fe",
   "aws_appsync_authenticationType": "API_KEY",
   "aws_appsync_additionalAuthenticationTypes": "AMAZON_COGNITO_USER_POOLS,AWS_IAM",
   "modelIntrospection": {
@@ -42,15 +42,15 @@
             "isRequired": true,
             "attributes": []
           },
-          "cognitoId": {
-            "name": "cognitoId",
+          "username": {
+            "name": "username",
             "isArray": false,
             "type": "String",
             "isRequired": true,
             "attributes": []
           },
-          "username": {
-            "name": "username",
+          "accountId": {
+            "name": "accountId",
             "isArray": false,
             "type": "String",
             "isRequired": true,
@@ -63,6 +63,20 @@
             "isRequired": false,
             "attributes": []
           },
+          "email": {
+            "name": "email",
+            "isArray": false,
+            "type": "AWSEmail",
+            "isRequired": false,
+            "attributes": []
+          },
+          "phone": {
+            "name": "phone",
+            "isArray": false,
+            "type": "AWSPhone",
+            "isRequired": false,
+            "attributes": []
+          },
           "status": {
             "name": "status",
             "isArray": false,
@@ -70,13 +84,6 @@
               "enum": "UserStatus"
             },
             "isRequired": true,
-            "attributes": []
-          },
-          "teamMembersId": {
-            "name": "teamMembersId",
-            "isArray": false,
-            "type": "ID",
-            "isRequired": false,
             "attributes": []
           },
           "createdAt": {
@@ -106,15 +113,6 @@
             "properties": {
               "fields": [
                 "id"
-              ]
-            }
-          },
-          {
-            "type": "key",
-            "properties": {
-              "name": "gsi-Team.members",
-              "fields": [
-                "teamMembersId"
               ]
             }
           },
@@ -158,6 +156,13 @@
             "isRequired": true,
             "attributes": []
           },
+          "icon": {
+            "name": "icon",
+            "isArray": false,
+            "type": "String",
+            "isRequired": false,
+            "attributes": []
+          },
           "admin": {
             "name": "admin",
             "isArray": false,
@@ -173,22 +178,6 @@
               ],
               "targetNames": [
                 "teamAdminId"
-              ]
-            }
-          },
-          "members": {
-            "name": "members",
-            "isArray": true,
-            "type": {
-              "model": "User"
-            },
-            "isRequired": false,
-            "attributes": [],
-            "isArrayNullable": false,
-            "association": {
-              "connectionType": "HAS_MANY",
-              "associatedWith": [
-                "teamMembersId"
               ]
             }
           },
@@ -216,6 +205,158 @@
         },
         "syncable": true,
         "pluralName": "Teams",
+        "attributes": [
+          {
+            "type": "model",
+            "properties": {}
+          },
+          {
+            "type": "key",
+            "properties": {
+              "fields": [
+                "id"
+              ]
+            }
+          },
+          {
+            "type": "auth",
+            "properties": {
+              "rules": [
+                {
+                  "allow": "public",
+                  "operations": [
+                    "read",
+                    "create",
+                    "delete",
+                    "update"
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "primaryKeyInfo": {
+          "isCustomPrimaryKey": false,
+          "primaryKeyFieldName": "id",
+          "sortKeyFieldNames": []
+        }
+      },
+      "TeamMember": {
+        "name": "TeamMember",
+        "fields": {
+          "id": {
+            "name": "id",
+            "isArray": false,
+            "type": "ID",
+            "isRequired": true,
+            "attributes": []
+          },
+          "team": {
+            "name": "team",
+            "isArray": false,
+            "type": {
+              "model": "Team"
+            },
+            "isRequired": true,
+            "attributes": [],
+            "association": {
+              "connectionType": "HAS_ONE",
+              "associatedWith": [
+                "id"
+              ],
+              "targetNames": [
+                "teamMemberTeamId"
+              ]
+            }
+          },
+          "user": {
+            "name": "user",
+            "isArray": false,
+            "type": {
+              "model": "User"
+            },
+            "isRequired": true,
+            "attributes": [],
+            "association": {
+              "connectionType": "HAS_ONE",
+              "associatedWith": [
+                "id"
+              ],
+              "targetNames": [
+                "teamMemberUserId"
+              ]
+            }
+          },
+          "alias": {
+            "name": "alias",
+            "isArray": false,
+            "type": "String",
+            "isRequired": false,
+            "attributes": []
+          },
+          "title": {
+            "name": "title",
+            "isArray": false,
+            "type": "String",
+            "isRequired": false,
+            "attributes": []
+          },
+          "role": {
+            "name": "role",
+            "isArray": false,
+            "type": {
+              "enum": "UserRole"
+            },
+            "isRequired": true,
+            "attributes": []
+          },
+          "joinAt": {
+            "name": "joinAt",
+            "isArray": false,
+            "type": "AWSDateTime",
+            "isRequired": true,
+            "attributes": []
+          },
+          "status": {
+            "name": "status",
+            "isArray": false,
+            "type": {
+              "enum": "UserStatus"
+            },
+            "isRequired": true,
+            "attributes": []
+          },
+          "teamMemberTeamId": {
+            "name": "teamMemberTeamId",
+            "isArray": false,
+            "type": "ID",
+            "isRequired": false,
+            "attributes": []
+          },
+          "teamMemberUserId": {
+            "name": "teamMemberUserId",
+            "isArray": false,
+            "type": "ID",
+            "isRequired": false,
+            "attributes": []
+          },
+          "createdAt": {
+            "name": "createdAt",
+            "isArray": false,
+            "type": "AWSDateTime",
+            "isRequired": true,
+            "attributes": []
+          },
+          "updatedAt": {
+            "name": "updatedAt",
+            "isArray": false,
+            "type": "AWSDateTime",
+            "isRequired": true,
+            "attributes": []
+          }
+        },
+        "syncable": true,
+        "pluralName": "TeamMembers",
         "attributes": [
           {
             "type": "model",
@@ -301,6 +442,13 @@
             "isRequired": true,
             "attributes": []
           },
+          "expiredAt": {
+            "name": "expiredAt",
+            "isArray": false,
+            "type": "AWSDateTime",
+            "isRequired": false,
+            "attributes": []
+          },
           "inviteCodeTeamId": {
             "name": "inviteCodeTeamId",
             "isArray": false,
@@ -364,20 +512,20 @@
       "UserSession": {
         "name": "UserSession",
         "fields": {
-          "id": {
-            "name": "id",
+          "userId": {
+            "name": "userId",
             "isArray": false,
             "type": "ID",
             "isRequired": true,
             "attributes": []
           },
-          "user": {
-            "name": "user",
+          "relation": {
+            "name": "relation",
             "isArray": false,
             "type": {
-              "model": "User"
+              "model": "TeamMember"
             },
-            "isRequired": true,
+            "isRequired": false,
             "attributes": [],
             "association": {
               "connectionType": "HAS_ONE",
@@ -385,30 +533,19 @@
                 "id"
               ],
               "targetNames": [
-                "userSessionUserId"
+                "userSessionRelationId"
               ]
             }
           },
-          "team": {
-            "name": "team",
+          "createAt": {
+            "name": "createAt",
             "isArray": false,
-            "type": {
-              "model": "Team"
-            },
+            "type": "AWSDateTime",
             "isRequired": true,
-            "attributes": [],
-            "association": {
-              "connectionType": "HAS_ONE",
-              "associatedWith": [
-                "id"
-              ],
-              "targetNames": [
-                "userSessionTeamId"
-              ]
-            }
+            "attributes": []
           },
-          "start": {
-            "name": "start",
+          "updateAt": {
+            "name": "updateAt",
             "isArray": false,
             "type": "AWSDateTime",
             "isRequired": true,
@@ -421,15 +558,8 @@
             "isRequired": true,
             "attributes": []
           },
-          "userSessionUserId": {
-            "name": "userSessionUserId",
-            "isArray": false,
-            "type": "ID",
-            "isRequired": false,
-            "attributes": []
-          },
-          "userSessionTeamId": {
-            "name": "userSessionTeamId",
+          "userSessionRelationId": {
+            "name": "userSessionRelationId",
             "isArray": false,
             "type": "ID",
             "isRequired": false,
@@ -461,7 +591,7 @@
             "type": "key",
             "properties": {
               "fields": [
-                "id"
+                "userId"
               ]
             }
           },
@@ -473,7 +603,8 @@
                   "allow": "public",
                   "operations": [
                     "read",
-                    "create"
+                    "create",
+                    "update"
                   ]
                 }
               ]
@@ -481,8 +612,8 @@
           }
         ],
         "primaryKeyInfo": {
-          "isCustomPrimaryKey": false,
-          "primaryKeyFieldName": "id",
+          "isCustomPrimaryKey": true,
+          "primaryKeyFieldName": "userId",
           "sortKeyFieldNames": []
         }
       }
@@ -501,6 +632,13 @@
           "ACTIVE",
           "SUSPEND",
           "CLOSED"
+        ]
+      },
+      "UserRole": {
+        "name": "UserRole",
+        "values": [
+          "ADMIN",
+          "MEMBER"
         ]
       }
     },

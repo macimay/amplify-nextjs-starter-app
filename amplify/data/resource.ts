@@ -10,11 +10,16 @@ authenticated via an API key, can only "read" records.
 const schema = a.schema({
   TeamType: a.enum(["TEAM", "PERSONAL"]),
   UserStatus: a.enum(["ACTIVE", "SUSPEND", "CLOSED"]),
+  UserRole: a.enum(["ADMIN", "MEMBER"]),
   User: a
     .model({
-      cognitoId: a.string().required(),
+      id: a.id(),
+
       username: a.string().required(),
+      accountId: a.string().required(),
       avatar: a.string(),
+      email: a.email(),
+      phone: a.phone(),
       status: a.ref("UserStatus").required(),
     })
     .authorization([
@@ -24,8 +29,22 @@ const schema = a.schema({
   Team: a
     .model({
       name: a.string().required(),
+      icon: a.string(),
       admin: a.hasOne("User").required(),
-      members: a.hasMany("User").arrayRequired(),
+    })
+    .authorization([
+      a.allow.public().to(["read", "create", "delete", "update"]),
+    ]),
+
+  TeamMember: a
+    .model({
+      team: a.hasOne("Team").required(),
+      user: a.hasOne("User").required(),
+      alias: a.string(),
+      title: a.string(),
+      role: a.ref("UserRole").required(),
+      joinAt: a.datetime().required(),
+      status: a.ref("UserStatus").required(),
     })
     .authorization([
       a.allow.public().to(["read", "create", "delete", "update"]),
@@ -36,7 +55,9 @@ const schema = a.schema({
       code: a.string().required(),
       team: a.hasOne("Team").required(),
       used: a.boolean().default(false),
+
       createAt: a.datetime().required(),
+      expiredAt: a.datetime(),
     })
     .authorization([
       a.allow.public().to(["read", "create", "delete", "update"]),
@@ -44,12 +65,49 @@ const schema = a.schema({
 
   UserSession: a
     .model({
-      user: a.hasOne("User").required(),
-      team: a.hasOne("Team").required(),
-      start: a.datetime().required(),
+      userId: a.id().required(),
+      relation: a.hasOne("TeamMember"),
+      createAt: a.datetime().required(),
+      updateAt: a.datetime().required(),
+
       ip: a.string().required(),
     })
-    .authorization([a.allow.public().to(["read", "create"])]),
+    .identifier(["userId"])
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
+
+  Product: a
+    .model({
+      id: a.id(),
+      name: a.string().required(),
+
+      isPublished: a.boolean().default(false),
+      createdAt: a.datetime().default(() => new Date()),
+      updatedAt: a.datetime().default(() => new Date()),
+    })
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
+
+  PricePackage: a
+    .model({
+      id: a.id(),
+      name: a.string().required(),
+      product: a.hasOne("Product").required(),
+      price: a.float().required(),
+      currency: a.string().required(),
+      description: a.string(),
+      createdAt: a.datetime().default(() => new Date()),
+      updatedAt: a.datetime().default(() => new Date()),
+    })
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
+
+  TeamOrder: a
+    .model({
+      id: a.id(),
+      team: a.hasOne("Team").required(),
+      pricePackage: a.hasOne("PricePackage").required(),
+      startDate: a.datetime().required(),
+      endDate: a.datetime().required(),
+    })
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

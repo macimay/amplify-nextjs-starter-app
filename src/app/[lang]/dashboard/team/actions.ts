@@ -1,103 +1,87 @@
 "use server";
 import { fetchUserAttributes, getCurrentUser } from "aws-amplify/auth/server";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+
 import { runWithAmplifyServerContext } from "@/server/amplifyServerInit";
 import { cookieBasedClient } from "@/server/amplifyCookieClient";
-import { type Schema } from "@/../amplify/data/resource";
-import { rejects } from "assert";
-import { resolve } from "path";
-import { error } from "console";
 
-export type CreateUserResultType = {
-  teamId: string;
-  teamName: string;
-  userId: string;
-  userName: string;
-  sessionId: string;
-  error: string;
-};
+enum TeamError {
+  TeamNameNotAvailable = "TeamNameNotAvailable",
+  ErrorNoInviteCode = "ErrorNoInviteCode",
+  ErrorRegisterUser = "ErrorRegisterUser",
+  TeamCreateFailed = "TeamCreateFailed",
+  GetInviteCodeFailed = "GetInviteCodeFailed",
+}
 
-export async function createUserAndTeam({ teamName }: { teamName: string }) {
+function generateCode(length: number) {
+  let result = "";
+  let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
+  let charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+export async function createTeam({ teamName }: { teamName: string }) {
   const userBrief = await runWithAmplifyServerContext({
     nextServerContext: { cookies },
     operation: (contextSpec) => fetchUserAttributes(contextSpec),
   });
 
-  const result: CreateUserResultType = {
-    teamId: "",
-    teamName: "",
-    userId: "",
-    userName: "",
-    sessionId: "",
-    error: "",
-  };
+  const nameAvailable = await checkTeamAvailable({ name: teamName });
+  if (nameAvailable) {
+    console.log("team name is available");
+  } else {
+    throw {
+      error: TeamError.TeamNameNotAvailable,
+      message: "Team name not available",
+    };
+  }
 
-  await checkTeamAvailable({ name: teamName })
-    .then((available) => {
-      console.log("team name available: ", available);
-      if (available) {
-        console.log("team name is available");
-        return registerUser({
-          subId: userBrief.sub!,
-          name: userBrief.preferred_username!,
-        });
-      } else {
-        throw { errors: "Team name is not available" };
-      }
-    })
-    .then((user) => {
-      console.log("register user success: ", user);
-      result.userId = user.data.id;
-      result.userName = user.data.username;
+  const { data: team, errors: error } =
+    await cookieBasedClient.models.Team.create({
+      name: teamName,
+      teamAdminId: userBrief.sub!,
+    });
+  if (team == null) {
+    throw {
+      error: TeamError.TeamCreateFailed,
+      message: `Team create failed: ${JSON.stringify(error)}`,
+    };
+  }
 
-      return cookieBasedClient.models.Team.create({
-        name: teamName,
-
-        teamAdminId: user.data.id,
-      });
-    })
-    .then((team) => {
-      console.log("create team success: ", team);
-
-      result.teamId = team.data.id;
-      result.teamName = team.data.name;
-      return createSession({ userId: result.userId, teamId: result.teamId });
-    })
-    .then((session) => {
-      console.log("create session success: ", session);
-      result.sessionId = session.data.id;
-    })
-    .catch((error) => {
-      console.log("create team failed: ", error);
+  const { data: teamMember, errors: inviteError } =
+    await cookieBasedClient.models.TeamMember.create({
+      teamMemberTeamId: team.id!,
+      teamMemberUserId: userBrief.sub!,
+      role: "ADMIN",
+      joinAt: new Date().toISOString(),
+      status: "ACTIVE",
+    });
+  if (inviteError) {
+    console.log("team member create failed: ", inviteError);
+  }
+  const { data: session, errors: sessionError } =
+    await cookieBasedClient.models.UserSession.update({
+      userId: userBrief.sub!,
+      userSessionRelationId: teamMember.id,
+      updateAt: new Date().toISOString(),
     });
 
-  console.log("result: ", result);
-  return result;
+  console.log("session update: ", session);
+  return JSON.stringify(session);
 }
 /**
  * check and see if the invite code  is available
  * @param param
  * @returns
  */
-export async function registerForInvite({
-  inviteCode,
-}: {
-  inviteCode: string;
-}) {
+export async function joinTeamByInvite({ inviteCode }: { inviteCode: string }) {
   const userBrief = await runWithAmplifyServerContext({
     nextServerContext: { cookies },
     operation: (contextSpec) => fetchUserAttributes(contextSpec),
   });
-
-  const result: CreateUserResultType = {
-    teamId: "",
-    teamName: "",
-    userId: "",
-    userName: "",
-    sessionId: "",
-    error: "",
-  };
 
   const { data: invites, errors: codeGetError } =
     await cookieBasedClient.models.InviteCode.list({
@@ -106,54 +90,34 @@ export async function registerForInvite({
           eq: inviteCode,
         },
       },
-      selectionSet: ["team.id", "team.members.id", "team.name"],
+      selectionSet: ["team.id", "team.name"],
     });
   if (codeGetError) {
     //can' find invite code
-    throw { error: `ErrorNoInviteCode ${JSON.stringify(codeGetError)}` };
+    throw {
+      error: TeamError.ErrorNoInviteCode,
+      message: `ErrorNoInviteCode ${JSON.stringify(codeGetError)}`,
+    };
   }
 
   console.log("invites: ", invites);
   if (invites.length == 0) {
-    throw { error: "ErrorNoInviteCode" };
+    throw { error: TeamError.ErrorNoInviteCode, message: "ErrorNoInviteCode" };
   }
   const invite = invites[0];
   console.log("invite: ", invite);
-  result.teamId = invite.team.id!;
-  const team = await invite.team;
 
-  const { data: user, errors: userRegisterError } = await registerUser({
-    subId: userBrief.sub!,
-    name: userBrief.preferred_username!,
-  });
-  if (userRegisterError) {
-    throw { error: "ErrorRegisterUser" };
-  }
-  result.userId = user.id;
-  result.userName = user.username;
-  const members = await team.members.map((member) => member.id);
-  members.push(user.id);
-
-  team.members.push(user.id);
-
-  const { data: teamUpdate, errors: teamUpdateError } =
-    await cookieBasedClient.models.Team.update({
-      id: result.teamId,
-      members: members.join(","), // Convert the array of member ids to a single string
+  const { data: teamMember, errors: inviteError } =
+    await cookieBasedClient.models.TeamMember.create({
+      teamMemberTeamId: invite.team.id!,
+      teamMemberUserId: userBrief.sub!,
+      role: "MEMBER",
+      joinAt: new Date().toISOString(),
+      status: "ACTIVE",
     });
 
-  console.log(`add user ${user.name} to team ${team.name}: `);
-  console.log("add user to team: ", result.teamId);
-  const { data: session, errors: sessionError } = await createSession({
-    userId: result.userId,
-    teamId: result.teamId,
-  });
-  if (sessionError) {
-    throw { error: "ErrorCreateSession" };
-  }
-
-  console.log("result: ", result);
-  return result;
+  console.log("join team:", invite.team);
+  return invite.team;
 }
 async function checkTeamAvailable({
   name,
@@ -185,55 +149,50 @@ async function checkTeamAvailable({
       });
   });
 }
-function registerUser({
-  subId,
-  name,
-}: {
-  subId: string;
-  name: string;
-}): Promise<any> {
-  return new Promise((resolve, reject) => {
-    console.log("createUser: ", name);
-    cookieBasedClient.models.User.create({
-      cognitoId: subId,
-      username: name,
-      status: "ACTIVE",
-    })
-      .then((user) => {
-        console.log("create user success: ", user);
-        return resolve(user);
-      })
-      .catch((errors) => {
-        if (errors) {
-          console.log("create user failed: ", errors);
-          reject(errors);
-        }
-      });
+export async function requestInviteCode(teamId: string, refresh: boolean) {
+  const userBrief = await runWithAmplifyServerContext({
+    nextServerContext: { cookies },
+    operation: (contextSpec) => fetchUserAttributes(contextSpec),
   });
+  if (refresh) {
+    console.log("refresh invite code");
+    await cookieBasedClient.models.InviteCode.delete({
+      teamId: teamId,
+    });
+    const code = createInviteCode(teamId);
+
+    return { code: code };
+  } else {
+    //return old ones
+    const { data: inviteCode, errors: codeGetError } =
+      await cookieBasedClient.models.InviteCode.list({
+        filter: {
+          inviteCodeTeamId: { eq: teamId },
+        },
+        selectionSet: ["code"],
+      });
+    if (codeGetError) {
+      console.log("get invite code failed");
+      throw {
+        error: TeamError.GetInviteCodeFailed,
+        message: "Error getting invite code",
+      };
+    }
+    if (inviteCode.length == 0) {
+      console.log("no invite code founded,request a new one");
+      const code = createInviteCode(teamId);
+      return { code: code };
+    }
+    return { code: inviteCode[0].code! };
+  }
 }
-function createSession({
-  userId,
-  teamId,
-}: {
-  userId: string;
-  teamId: string;
-}): Promise<any> {
-  return new Promise((resolve, reject) => {
-    cookieBasedClient.models.UserSession.create({
-      userSessionUserId: userId,
-      userSessionTeamId: teamId,
-      start: new Date().toISOString(),
-      ip: "",
-    })
-      .then((session) => {
-        console.log("create session success: ", session);
-        return resolve(session);
-      })
-      .catch((errors) => {
-        if (errors) {
-          console.log("create session failed: ", errors);
-          reject(errors);
-        }
-      });
+function createInviteCode(teamId: string) {
+  const code = generateCode(6);
+  cookieBasedClient.models.InviteCode.create({
+    inviteCodeTeamId: teamId,
+    used: false,
+    code: code,
+    createAt: new Date().toISOString(),
   });
+  return code;
 }

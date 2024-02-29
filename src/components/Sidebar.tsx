@@ -1,45 +1,61 @@
 "use client";
-export class EntryItem {
-  key: string;
-  title: string;
-  icon: string;
-  path: string;
-  children?: EntryItem[];
-  constructor(
-    key: string,
-    title: string,
-    icon: string,
-    path: string,
-    children?: EntryItem[]
-  ) {
-    this.key = key;
-    this.title = title;
-    this.icon = icon;
-    this.path = path;
+// src/components/Sidebar.tsx
+import React, { useState } from "react";
+import {
+  Button,
+  Spacer,
+  Image,
+  Link,
+  Listbox,
+  ListboxItem,
+} from "@nextui-org/react";
+import { HomeModernIcon } from "@heroicons/react/16/solid";
+import type { ReactNode, SVGProps } from "react";
+import { useRouter } from "next/navigation";
 
-    this.children = children;
-  }
+// src/types/menuItem.ts
+export interface MenuItem {
+  label: string;
+  icon: string; // This can be the name of the icon if using a text-based icon library
+  path: string;
 }
 
-export default function Sidebar({
-  items,
-  onItemChanged,
-}: {
-  items: EntryItem[];
-  onItemChanged: (item: EntryItem) => void;
-}) {
-  return (
-    <div>
-      {items.map((item) => (
-        <div key={item.key} onClick={() => onItemChanged(item)}>
-          <div>{item.icon}</div>
-          <div>{item.title}</div>
+export default function Sidebar({ items }: { items: MenuItem[] }) {
+  const [isExpanded, setIsExpanded] = useState(true);
 
-          {item.children && (
-            <Sidebar items={item.children} onItemChanged={onItemChanged} />
-          )}
-        </div>
-      ))}
+  const toggleSidebar = () => setIsExpanded(!isExpanded);
+  const router = useRouter();
+  return (
+    <div
+      style={{
+        width: isExpanded ? "200px" : "50px",
+        minHeight: "100vh",
+
+        transition: "width 0.3s",
+        padding: "10px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <Spacer y={1} />
+      <div>
+        <Listbox onChange={() => {}} aria-label="sidebar control">
+          {items.map((item, index) => (
+            <ListboxItem key={index} textValue={item.label}>
+              <div className="flex flex-row">
+                <Image
+                  src={item.icon}
+                  width={24}
+                  height={24}
+                  alt={item.label}
+                />
+                {isExpanded && <Link href={item.path}>{item.label}</Link>}
+              </div>
+            </ListboxItem>
+          ))}
+        </Listbox>
+      </div>
     </div>
   );
 }

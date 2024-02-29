@@ -4,9 +4,15 @@
   },
   "Navigation": {
     "workspace": "工作区",
-    "team": "团队",
+    "marketplace": "ai场景库",
+    "practice": "练手区",
+    "documents": "文档",
     "signOut": "退出账号",
-    "profile": "个人设置"
+    "profile": "个人信息",
+    "menuMain": "团队",
+    "menuMember": "成员",
+    "menuSetting": "设置",
+    "menuPrice": "价格"
   },
   "Footer": {
     "productTitle": "产品&服务"
@@ -34,6 +40,7 @@
     "menuMain": "团队",
     "menuMember": "成员",
     "menuSetting": "设置",
+    "menuPrice": "价格",
     "memberInviteTitle": "你可以邀请您的同事和您一起创作",
     "memberInvite": "邀请成员"
   },
@@ -52,6 +59,25 @@
     "inviteDescription": "我收到了加入企业的邀请码，我需要加入企业",
     "inviteInputPrompt": "请输入邀请码",
     "TeamTitle": "置一个有创意的团队名字，开始工作",
-    "TeamInputPrompt": "请输入团队名称"
+    "TeamInputPrompt": "请输入团队名称",
+    "InitializeUserSession": "正在初始化用户会话..."
+  },
+
+  "ProfilePage": {
+    "accountId": "登录账号",
+    "name": "姓名",
+    "email": "邮箱",
+    "phone": "电话",
+    "password": "密码",
+    "avatar": "头像",
+    "save": "保存",
+    "tabPersonal": "个人信息",
+    "tabSecurity": "安全设置",
+    "tabTeam": "团队设置",
+    "tabBilling": "账单",
+    "LabelTeamName": "团队名称",
+    "LabelTeamAlias": "团队别名",
+    "LabelTeamRole": "团队角色",
+    "LabelTeamTitle": "团队名称"
   }
 }
