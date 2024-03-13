@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { loginStatus } from "@/components/LoginStatus";
 import { useEffect, useState } from "react";
 
-import { Button, Divider, Link, Snippet } from "@nextui-org/react";
+import { Button, Divider, Link, Snippet, Spacer } from "@nextui-org/react";
 import { useTranslations } from "next-intl";
 import { generateClient } from "aws-amplify/data";
 import { Schema } from "@/../amplify/data/resource";
@@ -34,6 +34,9 @@ export default function TeamMembersPage() {
 
   const [code, setCode] = useState("xxx");
   const [refreshCode, setRefresh] = useState(0);
+  const [propertyList, setPropertyList] = useState<
+    Schema["TeamSubscription"][]
+  >([]);
   const { session } = useTeamContext();
 
   useEffect(() => {
@@ -57,18 +60,41 @@ export default function TeamMembersPage() {
       .catch((err) => {
         console.log("error:", err);
       });
+    const client = generateClient<Schema>({
+      authMode: "apiKey",
+    });
+    client.models.TeamSubscription.list({
+      filter: { teamSubscriptionTeamId: { eq: session.relation.team.id } },
+    }).then((subscriptions) => {
+      console.log("subscriptions:", subscriptions);
+      setPropertyList(subscriptions.data);
+    });
   }, []);
 
   return (
     <div className="flex flex-col h-screen container ">
-      <div className="adjust-start text-3xl bold">{t("memberInviteTitle")}</div>
-      <Divider />
-      <div className="flex h-32 justify-center text-4xl">
-        <Snippet size="lg">{code}</Snippet>
+      <div>
+        <div className="adjust-start text-3xl bold">
+          {t("memberInviteTitle")}
+        </div>
+        <Divider />
+        <div className="flex h-32 justify-center text-4xl">
+          <Snippet size="lg">{code}</Snippet>
+        </div>
+        <div className="flex justify-center">
+          <Link>{t("memberInvite")}</Link>
+        </div>
+        <Spacer y={2} />
+        <div className="adjust-start text-3xl bold">{t("teamProperty")}</div>
+        <Divider />
+        {propertyList.map((property) => (
+          <div key={property.id}>
+            <div>{property.package.name}</div>
+          </div>
+        ))}
       </div>
-      <div className="flex justify-center">
-        <Link>{t("memberInvite")}</Link>
-      </div>
+
+      <Divider></Divider>
     </div>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 import React from "react";
 import { Tabs, Tab } from "@nextui-org/react";
-import { EntryItem } from "./Sidebar";
+import { MenuItem } from "./Sidebar";
 export default function Tabbar({
   items,
   activePath,
 }: {
-  items: EntryItem[];
+  items: MenuItem[];
   activePath: string;
 }) {
   return (
@@ -17,7 +17,7 @@ export default function Tabbar({
         selectedKey={activePath}
       >
         {items.map((item) => (
-          <Tab key={item.path} title={item.title} href={item.path} />
+          <Tab key={item.path} title={item.label} href={item.path} />
         ))}
       </Tabs>
     </div>

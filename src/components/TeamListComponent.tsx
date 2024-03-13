@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { loginStatus } from "./LoginStatus";
-import { generateClient } from "aws-amplify/api";
+import { SelectionSet, generateClient } from "aws-amplify/api";
 import { Schema } from "../../amplify/data/resource";
 import { Listbox, ListboxItem } from "@nextui-org/react";
 import { useTeamContext } from "./TeamContext";
@@ -10,7 +10,12 @@ export default function TeamListComponent({
 }: {
   callback: (team: any) => void;
 }) {
-  const [teamList, setTeamList] = useState<Schema["Team"][]>([]);
+  const selectionSet = ["team.*", "team.admin.*"] as const;
+  type TeamListPackage = SelectionSet<
+    Schema["TeamMember"],
+    typeof selectionSet
+  >;
+  const [teamList, setTeamList] = useState<TeamListPackage[]>([]);
   const { session } = useTeamContext();
 
   useEffect(() => {
@@ -25,15 +30,10 @@ export default function TeamListComponent({
     console.log("TeamListComponent:userId", session.relation?.user.id);
     client.models.TeamMember.list({
       filter: { teamMemberUserId: { eq: session.relation?.user.id } },
-      selectionSet: ["team.*", "team.admin.*"],
+      selectionSet: selectionSet,
     }).then((teams) => {
       console.log("teams:", teams);
-      setTeamList(
-        teams.data.map((team) => ({
-          ...team.team,
-          admin: team.team.admin as any, // Update the type of the admin property
-        }))
-      );
+      setTeamList(teams.data);
     });
   }, []);
 
@@ -42,14 +42,14 @@ export default function TeamListComponent({
       <Listbox aria-label="Team List" items={teamList}>
         {(team) => (
           <ListboxItem
-            key={team.id}
-            value={team.id}
+            key={team.team.id}
+            value={team.team.id}
             onClick={() => {
-              console.log("team:", team);
-              callback(team);
+              console.log("team selected:", team);
+              callback(team.team);
             }}
           >
-            {team.name}
+            {team.team.name}
           </ListboxItem>
         )}
       </Listbox>

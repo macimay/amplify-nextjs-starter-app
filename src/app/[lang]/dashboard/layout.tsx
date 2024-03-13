@@ -16,9 +16,8 @@ import { AuthUser } from "aws-amplify/auth";
 import { loginStatus } from "@/components/LoginStatus";
 import { Schema } from "@/../amplify/data/resource";
 import { TeamWrapper, useTeamContext } from "@/components/TeamContext";
-import Sidebar, { MenuItem } from "@/components/Sidebar";
 
-export default function DashbordLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -47,15 +46,7 @@ export default function DashbordLayout({
       console.log(err);
     }
   }, []);
-  const menuItems: MenuItem[] = [
-    {
-      label: "Home",
-      icon: "/assets/picture/icons8-paint-48.png",
-      path: "/workspace",
-    },
-    { label: "Profile", icon: "", path: "/dashboard/profile" },
-    { label: "Settings", icon: "", path: "/dashboard/profile" },
-  ];
+
   return (
     <Authenticator.Provider>
       <Authenticator>
@@ -70,8 +61,7 @@ export default function DashbordLayout({
                   {pathName.indexOf("/dashboard/loading") < 0 && (
                     <NavigationBar />
                   )}
-                  <div className="flex flex-row w-full h-full">
-                    <Sidebar items={menuItems} />
+                  <div className="flex flex-row w-full h-full mt-20">
                     {children}
                   </div>
                 </div>

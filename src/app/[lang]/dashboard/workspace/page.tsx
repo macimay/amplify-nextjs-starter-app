@@ -1,24 +1,58 @@
 "use client";
 import Sidebar, { MenuItem } from "@/components/Sidebar";
+import { generateClient } from "aws-amplify/api";
+import { useEffect, useState } from "react";
+import { Schema } from "@/../amplify/data/resource";
+import { useTeamContext } from "@/components/TeamContext";
 
 // Define your menu items with icons and labels
-const menuItems: MenuItem[] = [
-  {
-    label: "Home",
-    icon: "assets/picture/icons8-paint-48.png",
-    path: "/workspace",
-  },
-  { label: "Profile", icon: "", path: "/dashboard/profile" },
-  { label: "Settings", icon: "", path: "/dashboard/profile" },
-];
+var menuItems: MenuItem[] = [];
 export default function Page() {
+  const { session } = useTeamContext();
+  const [products, setProducts] = useState<Schema["TeamProductPool"][]>([]);
+  const client = generateClient<Schema>({
+    authMode: "apiKey",
+  });
+  useEffect(() => {
+    console.log("Page useEffect called");
+    const sub = client.models.TeamProductPool.observeQuery({
+      filter: {
+        or: [
+          { teamId: { eq: session?.relation?.team?.id } },
+          { status: { eq: "ACTIVE" } },
+        ],
+      },
+      selectionSet: ["package.*", "package.product.*"],
+    }).subscribe({
+      next: ({ items, isSynced }) => {
+        console.log("TeamProductPool event:", items);
+        menuItems = [];
+        items.map((item) => {
+          console.log(item);
+          menuItems.push({
+            label: item.package.product.name,
+            icon: item.package.product.icon!,
+            path: item.package.product.shortName,
+          });
+        });
+      },
+      error: (error) => {
+        console.error("Error:", error);
+      },
+    });
+    // session.relation?.team.products.map((product: Schema["Product"]) => {
+    //   console.log(product);
+    //   menuItems.push({
+    //     label: product.name,
+    //     icon: product.icon!,
+    //     path: product.shortName,
+    //   });
+    // });
+  }, [session.relation.team]);
+
   return (
-    <div className="flex flex-row w-full h-full">
-      <Sidebar items={menuItems} />
-      <div className="flex flex-col">
-        <h1>Dashboard</h1>
-        <p>Welcome to the dashboard</p>
-      </div>
-    </div>
+    <>
+      <iframe src="/web/index.html" className="w-full" />
+    </>
   );
 }

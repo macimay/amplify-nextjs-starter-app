@@ -25,6 +25,7 @@ export default function Sidebar({ items }: { items: MenuItem[] }) {
 
   const toggleSidebar = () => setIsExpanded(!isExpanded);
   const router = useRouter();
+  console.log("")
   return (
     <div
       style={{
@@ -42,7 +43,7 @@ export default function Sidebar({ items }: { items: MenuItem[] }) {
       <div>
         <Listbox onChange={() => {}} aria-label="sidebar control">
           {items.map((item, index) => (
-            <ListboxItem key={index} textValue={item.label}>
+            <ListboxItem key={item.path} textValue={item.label}>
               <div className="flex flex-row">
                 <Image
                   src={item.icon}

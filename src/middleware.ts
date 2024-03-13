@@ -21,6 +21,9 @@ export async function middleware(request: NextRequest) {
     locales: locales,
     defaultLocale: "en",
   });
+  // if (request.nextUrl.pathname.indexOf("admin") > -1) {
+  //   return NextResponse.next();
+  // }
   const response = handleI18nRouting(request);
   // const response = NextResponse.next();
   const authenticated = await runWithAmplifyServerContext({

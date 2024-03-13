@@ -12,7 +12,9 @@
     "menuMain": "团队",
     "menuMember": "成员",
     "menuSetting": "设置",
-    "menuPrice": "价格"
+    "menuPrice": "价格",
+    "teamInfo": "团队",
+    "menuOrder": "订单"
   },
   "Footer": {
     "productTitle": "产品&服务"
@@ -42,7 +44,8 @@
     "menuSetting": "设置",
     "menuPrice": "价格",
     "memberInviteTitle": "你可以邀请您的同事和您一起创作",
-    "memberInvite": "邀请成员"
+    "memberInvite": "邀请成员",
+    "teamProperty": "团队资产"
   },
   "Loading": {
     "WelcomeFreshNew": "谢谢您选择WeDraw,为了方便您尽快使用，请稍等片刻",

@@ -12,7 +12,10 @@
     "menuMain": "Main",
     "menuMember": "Members",
     "menuSetting": "Settings",
-    "menuPrice": "Price"
+    "menuPrice": "Price",
+    "menuOrder": "Order",
+    "teamInfo": "Team Info",
+    "teamProperty": "Team Property"
   },
   "Footer": {
     "productTitle": "Product"

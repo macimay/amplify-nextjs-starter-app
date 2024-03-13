@@ -1,6 +1,5 @@
 import { defineAuth } from "@aws-amplify/backend";
 import { defineFunction } from "@aws-amplify/backend-function";
-import { afterSignUp } from "../functions/onUserSignUp/resource.js";
 
 /**
  * Define and configure your auth resource

@@ -2,13 +2,22 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Schema } from "@/../amplify/data/resource";
 import { loginStatus } from "./LoginStatus";
-import { generateClient } from "aws-amplify/api";
+import { SelectionSet, generateClient } from "aws-amplify/api";
 import { getCurrentUser } from "aws-amplify/auth";
 
 const TeamContext = createContext<any>(undefined);
 
 export function TeamWrapper({ children }: { children: React.ReactNode }) {
-  let [session, setSession] = useState<Schema["UserSession"] | null>(null);
+  const selectionSet = [
+    "userId",
+    "relation.user.*",
+    "relation.team.*",
+  ] as const;
+  type SessionWithPackage = SelectionSet<
+    Schema["UserSession"],
+    typeof selectionSet
+  >;
+  let [session, setSession] = useState<SessionWithPackage>();
 
   useEffect(() => {
     console.log("TeamWrapper useEffect called");
@@ -27,6 +36,7 @@ export function TeamWrapper({ children }: { children: React.ReactNode }) {
 
       const sub = client.models.UserSession.onUpdate({
         filter: { userId: { eq: user.userId } },
+        selectionSet: selectionSet,
       }).subscribe({
         next: (data) => {
           console.log("UserSession event:", data);
