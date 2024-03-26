@@ -9,13 +9,13 @@ import { useTeamContext } from "@/components/TeamContext";
 var menuItems: MenuItem[] = [];
 export default function Page() {
   const { session } = useTeamContext();
-  const [products, setProducts] = useState<Schema["TeamProductPool"][]>([]);
+  const [products, setProducts] = useState<Schema["ProductPool"][]>([]);
   const client = generateClient<Schema>({
     authMode: "apiKey",
   });
   useEffect(() => {
     console.log("Page useEffect called");
-    const sub = client.models.TeamProductPool.observeQuery({
+    const sub = client.models.ProductPool.observeQuery({
       filter: {
         or: [
           { teamId: { eq: session?.relation?.team?.id } },

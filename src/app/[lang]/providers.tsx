@@ -16,12 +16,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
       enableSystem
       disableTransitionOnChange
     >
       <Authenticator.Provider>
-        <main>{children}</main>
+        <main className="bg-background text-foreground ">{children}</main>
       </Authenticator.Provider>
     </ThemeProvider>
 

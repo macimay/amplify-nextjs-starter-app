@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import DetailForm from "@/components/admin/DetailForm";
 import { ProductType } from "@/type/ProductType";
-import { Divide, SeparatorHorizontal } from "lucide-react";
+
 import { Separator } from "@/components/ui/separator";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
@@ -21,7 +21,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { randomUUID } from "crypto";
+
+import PackageListComponent from "@/components/admin/PackageListComponent";
+import ProductDescriptionList from "@/components/admin/ProductDescriptionList";
 
 export default function ProductPage({
   params,
@@ -46,20 +48,56 @@ export default function ProductPage({
       setProduct(ProductType.createEmpty());
     }
   }, []);
-  const createFunction = (
-    id: string,
-    values: z.infer<z.ZodObject<any, any>>
-  ) => {
-    console.log("create product:", id);
-    client.models.Product.create({
-      name: values["name"],
-      shortName: values["shortName"],
-      icon: values["icon"],
-      publish: values["publish"],
-    }).then((product): void => {
-      console.log("product:", product);
-      router.replace(`/admin/products/detail/${product.data.id}`);
-    });
+  const handleSubmit = (values: z.infer<z.ZodObject<any, any>>) => {
+    if (values["id"].length == 0) {
+      //create product
+      console.log("create product");
+      const iconKey = uuidv4();
+      uploadData({
+        key: iconKey,
+        data: values["icon"],
+      }).result.then((result) => {
+        console.log("result:", result);
+        if (result.key) {
+          const client = generateClient<Schema>({
+            authMode: "apiKey",
+          });
+          client.models.Product.create({
+            name: values["name"],
+            shortName: values["shortName"],
+            icon: result.key,
+            publish: values["publish"],
+          }).then((newProduct): void => {
+            console.log("new product:", product);
+            router.replace(`/admin/products/detail/${newProduct.data.id}`);
+          });
+        }
+      });
+    } else {
+      console.log("update product");
+      const iconKey = uuidv4();
+      uploadData({
+        key: iconKey,
+        data: values["icon"],
+      }).result.then((result) => {
+        console.log("result:", result);
+        if (result.key) {
+          const client = generateClient<Schema>({
+            authMode: "apiKey",
+          });
+          client.models.Product.update({
+            id: values["id"],
+            name: values["name"],
+            shortName: values["shortName"],
+            icon: result.key,
+            publish: values["publish"],
+          }).then((newProduct): void => {
+            console.log("update product:", product);
+            router.replace(`/admin/products/detail/${newProduct.data.id}`);
+          });
+        }
+      });
+    }
   };
 
   return (
@@ -76,37 +114,9 @@ export default function ProductPage({
             {product && (
               <DetailForm
                 data={product!}
-                submit={(values: z.infer<z.ZodObject<any, any>>) => {
+                onSubmitCallback={(values: z.infer<z.ZodObject<any, any>>) => {
                   console.log("page submit product:", values);
-                  if (values["id"].length == 0) {
-                    //create product
-                    console.log("create product");
-                    const iconKey = uuidv4();
-
-                    uploadData({
-                      key: iconKey,
-                      data: values["icon"],
-                    }).result.then((result) => {
-                      console.log("result:", result);
-                      if (result.key) {
-                        const client = generateClient<Schema>({
-                          authMode: "apiKey",
-                        });
-                        client.models.Product.create({
-                          name: values["name"],
-                          shortName: values["shortName"],
-                          icon: result.key,
-                          publish: values["publish"],
-                        }).then((product): void => {
-                          console.log("product:", product);
-                          router.replace(
-                            `/admin/products/detail/${product.data.id}`
-                          );
-                        });
-                      }
-                      createFunction(result.key, values);
-                    });
-                  }
+                  handleSubmit(values);
                 }}
               />
             )}
@@ -115,7 +125,24 @@ export default function ProductPage({
       </div>
 
       <Separator className="my-4" />
-      <div>{product?.id && <Button>product exists</Button>}</div>
+      <div className="flex flex-row justify-between">
+        <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+          Product Package List
+        </h2>
+        <Button
+          asChild
+          onClick={() => {
+            router.push(`/admin/packages/detail/${product?.id}`);
+          }}
+        >
+          <img src="/assets/picture/plus.png" width={24} height={24} />
+        </Button>
+      </div>
+
+      {product && (
+        <PackageListComponent filterType="byProduct" filterValue={product.id} />
+      )}
+      {product && <ProductDescriptionList productionId={product.id} />}
     </div>
   );
 }

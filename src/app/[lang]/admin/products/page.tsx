@@ -2,19 +2,20 @@
 import { useEffect, useState } from "react";
 import { Schema } from "@/../amplify/data/resource";
 import { generateClient } from "aws-amplify/api";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell,
-  Pagination,
-  Button,
-  Link,
-} from "@nextui-org/react";
+
 import { List } from "lucide-react";
 import ListItemBar from "@/components/admin/ListItemBar";
+import S3Image from "@/components/S3Image";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Schema["Product"][]>([]);
@@ -41,23 +42,31 @@ export default function ProductsPage() {
       <div className="flex flex-col">
         <Table aria-label="Products">
           <TableHeader>
-            <TableColumn>ID</TableColumn>
-            <TableColumn>Name</TableColumn>
-            <TableColumn>Icon</TableColumn>
-            <TableColumn>Action</TableColumn>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Icon</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
           </TableHeader>
           <TableBody>
             {products?.map((product) => (
               <TableRow key={product.id}>
-                <TableCell>{product.id}</TableCell>
+                <TableCell>{product.id.substring(0, 8)}</TableCell>
                 <TableCell>{product.name}</TableCell>
-                <TableCell>{product.icon}</TableCell>
                 <TableCell>
-                  <Button
-                    as={Link}
-                    href={`/admin/products/detail/${product.id}`}
-                  >
-                    编辑
+                  <S3Image
+                    s3Key={product.icon}
+                    key={product.id}
+                    width={24}
+                    height={24}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button asChild>
+                    <Link href={`/admin/products/detail/${product.id}`}>
+                      编辑
+                    </Link>
                   </Button>
                 </TableCell>
               </TableRow>

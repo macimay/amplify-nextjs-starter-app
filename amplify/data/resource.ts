@@ -11,8 +11,12 @@ const schema = a.schema({
   TeamType: a.enum(["TEAM", "PERSONAL"]),
   Status: a.enum(["ACTIVE", "PENDING", "SUSPEND", "CLOSED"]),
   UserRole: a.enum(["ADMIN", "MEMBER"]),
-  PackagePeriod: a.enum(["DAY", "MONTH", "YEAR"]),
+  Periodic: a.enum(["DAY", "WEEK", "MONTH", "YEAR"]),
+  PackageUnit: a.enum(["TIMES", "SECOND"]),
   ExpireType: a.enum(["NEVER", "RELATIVE", "ABSOLUTE"]),
+  PriceCurrency: a.enum(["CNY", "USD", "EUR", "JPY", "GBP"]),
+  SubscriptionRegion: a.enum(["GLOBAL", "CN", "US", "EU", "JP", "UK"]),
+
   User: a
     .model({
       id: a.id(),
@@ -32,7 +36,8 @@ const schema = a.schema({
       name: a.string().required(),
       icon: a.string(),
       admin: a.hasOne("User").required(),
-      subscriptions: a.hasMany("TeamSubscription"),
+      level: a.integer().default(0).required(),
+      region: a.ref("SubscriptionRegion").required(),
     })
     .authorization([
       a.allow.public().to(["read", "create", "delete", "update"]),
@@ -81,21 +86,34 @@ const schema = a.schema({
       name: a.string().required(),
       shortName: a.string().required(),
       icon: a.string().required(),
-      package: a.hasMany("ProductPackage"),
       description: a.hasMany("ProductDescription"),
-      publish: a.boolean().default(false).required(),
+      publish: a.boolean().default(true).required(),
+      packages: a.hasMany("ProductPackage"),
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
-  TeamProductPool: a
+  ProductDescription: a
     .model({
-      id: a.id(),
+      imageKey: a.string(),
+      description: a.string(),
+      publish: a.boolean().default(false).required(),
+      order: a.integer().required(),
+      region: a.ref("SubscriptionRegion").required(),
+      createdAt: a.datetime(),
+    })
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
+
+  ProductPool: a
+    .model({
       teamId: a.string().required(),
       package: a.hasOne("ProductPackage").required(),
       count: a.integer().required(),
-      period: a.ref("PackagePeriod").required(),
+      // usage: a.hasMany("ProductUsage"),
+
+      unit: a.ref("PackageUnit").required(),
+      period: a.ref("Periodic").required(),
       used: a.integer().required(),
       priority: a.integer().required(),
       status: a.ref("Status").required(),
@@ -104,26 +122,46 @@ const schema = a.schema({
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
+  ProductUsage: a
+    .model({
+      teamId: a.string().required(),
+      // pool: a.belongsTo("ProductPool"),
+      used: a.integer().required(),
+      lastUpdateAt: a.datetime(),
+      StartAt: a.datetime(),
+    })
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
+
   Subscriptions: a
     .model({
-      id: a.id(),
-      shortName: a.string().required(),
-      packages: a.hasMany("ProductPackage"),
-      count: a.integer().required(),
-      period: a.ref("PackagePeriod").required(),
-      periodStart: a.datetime(),
-      periodEnd: a.datetime(),
+      name: a.string().required(),
+      packages: a.manyToMany("ProductPackage", {
+        relationName: "ProductPackageSubscriptions",
+      }),
+      price: a.float().required(),
+      currency: a.ref("PriceCurrency").required(),
+      period: a.ref("Periodic").required(),
+      capacity: a.integer().required(),
+
+      amount: a.integer().required(),
+      description: a.string().required(),
+      region: a.ref("SubscriptionRegion").required(),
+      level: a.integer().required(),
+      isExpired: a.ref("ExpireType").required(),
+
+      availableAt: a.date(),
+      expireAt: a.date(),
+      expireInDays: a.integer(),
+      publish: a.boolean().default(true).required(),
     })
-    .secondaryIndexes([a.index("shortName")])
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
   TeamSubscription: a
     .model({
-      id: a.id(),
-      team: a.hasOne("Team").required(),
-      package: a.hasOne("ProductPackage").required(),
+      team: a.hasOne("Team"),
+      premier: a.ref("Subscriptions").required(),
+      packages: a.hasMany("ProductPackage"),
       count: a.integer().required(),
-      period: a.ref("PackagePeriod").required(),
       status: a.ref("Status").required(),
       startAt: a.datetime(),
       expireAt: a.datetime(),
@@ -131,30 +169,21 @@ const schema = a.schema({
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
-  ProductDescription: a
-    .model({
-      id: a.id(),
-      product: a.belongsTo("Product"),
-      language: a.string().required(),
-      Image: a.string(),
-      description: a.string(),
-      enabled: a.boolean().default(false).required(),
-      order: a.integer().required(),
-      createdAt: a.datetime(),
-    })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
-
   ProductPackage: a
     .model({
-      id: a.id(),
       product: a.belongsTo("Product"),
+      subscriptions: a.manyToMany("Subscriptions", {
+        relationName: "ProductPackageSubscriptions",
+      }),
       name: a.string().required(),
-      price: a.float().required(),
-      currency: a.string().required(),
+      count: a.integer().required(),
+      unit: a.ref("PackageUnit").required(),
       description: a.string(),
-      isExpired: a.ref("ExpireType").required(),
-      expireAt: a.datetime(),
-      availableAt: a.datetime(),
+
+      region: a.ref("SubscriptionRegion").required(),
+      isExpire: a.ref("ExpireType").required(),
+      availableAt: a.date(),
+      expireAt: a.date(),
       expireInDays: a.integer(),
 
       createdAt: a.datetime(),
@@ -162,25 +191,13 @@ const schema = a.schema({
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
-  PriceCurrency: a
+  SubscriptionOrder: a
     .model({
       id: a.id(),
-      name: a.string().required(),
-      code: a.string().required(),
-      symbol: a.string().required(),
-      rate: a.float().required(),
-      createdAt: a.datetime(),
-      updatedAt: a.datetime(),
-    })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
-
-  PackageOrder: a
-    .model({
-      id: a.id(),
-      team: a.hasOne("Team").required(),
-      user: a.hasOne("User").required(),
-      pricePackage: a.hasOne("ProductPackage").required(),
+      team: a.hasOne("Team"),
+      subscriptions: a.hasOne("Subscriptions"),
       price: a.float().required(),
+      currency: a.ref("PriceCurrency").required(),
       count: a.integer().required(),
       amount: a.float().required(),
       createAt: a.datetime().required(),

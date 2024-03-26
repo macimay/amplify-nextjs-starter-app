@@ -1,5 +1,5 @@
 import { Schema } from "@/../amplify/data/resource";
-import { FormDefineType } from "./FormDefineType";
+import { InputDefineType } from "./InputDefineType";
 import { IBaseData } from "./IBaseData";
 import { z } from "zod";
 
@@ -35,35 +35,25 @@ export class ProductType implements IBaseData {
   static createEmpty(): ProductType {
     return new ProductType("", "", "", "");
   }
-  formData(): z.ZodObject<any, any> {
+  formData(): any {
     return z.object({
       id: z.string().optional(),
       name: z.string(),
       shortName: z.string(),
-      icon: z.instanceof(File, { message: "please select as image as icon" }),
+      icon: z.instanceof(File, {
+        message: "please select an image as icon",
+      }),
 
       publish: z.boolean().default(true),
     });
   }
-  formStructure(key: string): FormDefineType | undefined {
-    switch (key) {
-      case "id":
-        return new FormDefineType("id", "ID", "hidden", true);
-      case "name":
-        return new FormDefineType("name", "产品名称", "text", true);
-      case "shortName":
-        return new FormDefineType(
-          "shortName",
-          "简称(英文，不能有空格)",
-          "text",
-          true
-        );
-      case "icon":
-        return new FormDefineType("icon", "图标", "image", true);
-      case "publish":
-        return new FormDefineType("publish", "是否发布", "switch", true);
-      default:
-        return undefined;
-    }
+  formStructure(): InputDefineType[] {
+    return [
+      new InputDefineType("id", "ID", "hidden"),
+      new InputDefineType("name", "产品名称", "text"),
+      new InputDefineType("shortName", "简称(英文，不能有空格)", "text"),
+      new InputDefineType("icon", "图标", "image"),
+      new InputDefineType("publish", "是否发布", "switch"),
+    ];
   }
 }

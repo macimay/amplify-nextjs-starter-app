@@ -43,6 +43,7 @@ export async function createTeam({ teamName }: { teamName: string }) {
     await cookieBasedClient.models.Team.create({
       name: teamName,
       teamAdminId: userBrief.sub!,
+      level: 0,
     });
   if (team == null) {
     throw {

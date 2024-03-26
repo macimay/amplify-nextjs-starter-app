@@ -1,19 +1,19 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Schema } from "@/../amplify/data/resource"; // Import the Schema object from the appropriate module
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell,
-  Pagination,
-  Button,
-  Link,
-} from "@nextui-org/react";
+
 import { generateClient } from "aws-amplify/api";
 import { ConsoleLogger } from "aws-amplify/utils";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function PackagePage() {
   const [packages, setPackages] = useState<Schema["ProductPackage"][]>([]); // Add the missing type annotation for the state variable
@@ -35,15 +35,12 @@ export default function PackagePage() {
   return (
     <div className="flex flex-row w-full h-full">
       <div className="flex flex-col justify-center items-center">
-        <Button as={Link} href="/admin/packages/detail/">
-          新建收费包
-        </Button>
         <Table aria-label="Packages of Product">
           <TableHeader>
-            <TableColumn>ID</TableColumn>
-            <TableColumn>Name</TableColumn>
-            <TableColumn>Price</TableColumn>
-            <TableColumn>Action</TableColumn>
+            <TableHead>ID</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Action</TableHead>
           </TableHeader>
 
           <TableBody>
@@ -51,27 +48,16 @@ export default function PackagePage() {
               <TableRow key={productPackage.id}>
                 <TableCell>{productPackage.id}</TableCell>
                 <TableCell>{productPackage.name}</TableCell>
-                <TableCell>{productPackage.price}</TableCell>
+
                 <TableCell>
-                  <Button
-                    as={Link}
-                    href={`/admin/packages/detail/${productPackage.id}`}
-                  >
+                  <Link href={`/admin/packages/detail/${productPackage.id}`}>
                     编辑
-                  </Button>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <Pagination
-          total={10}
-          initialPage={1}
-          showControls
-          onChange={(no) => {
-            setPageNo(no);
-          }}
-        />
       </div>
     </div>
   );

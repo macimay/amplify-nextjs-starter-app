@@ -2,7 +2,7 @@ import { type Schema } from "@/../amplify/data/resource";
 export default function StableDiffusion({
   product,
 }: {
-  product: Schema["Product"] ;
+  product: Schema["Product"];
 }) {
   return (
     <div>
@@ -15,6 +15,7 @@ export default function StableDiffusion({
         The data is fetched server-side and will be rendered to HTML before the
         page is served.
       </p>
+      <p>product:{JSON.stringify(product)}</p>
     </div>
   );
 }

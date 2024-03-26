@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getUrl } from "aws-amplify/storage";
 
 export default function S3Image({
-  key,
+  s3Key,
   ...props
 }: {
   key: string | undefined;
@@ -11,12 +11,13 @@ export default function S3Image({
 }) {
   const [imageUrl, setImageUrl] = useState("/assets/picture/empty-image.png");
 
+  console.log("S3Image key:", s3Key);
   useEffect(() => {
-    if (key !== undefined) {
-      getUrl({ key: key }).then((url) => {
+    if (s3Key !== undefined) {
+      getUrl({ key: s3Key }).then((url) => {
         setImageUrl(url.url.href);
       });
     }
-  }, [key]);
+  }, [s3Key]);
   return <img src={imageUrl} {...props} />;
 }

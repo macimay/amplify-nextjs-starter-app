@@ -29,6 +29,9 @@ export default function Sidebar() {
           </Link>
         </li>
         <li>
+          <Link href="/admin/subscriptions">订阅管理</Link>
+        </li>
+        <li>
           <Link href="/admin/teams">团队管理</Link>
         </li>
         <li>
