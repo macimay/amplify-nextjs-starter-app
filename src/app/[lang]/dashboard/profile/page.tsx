@@ -4,23 +4,6 @@ import { useEffect, useState, useTransition, type Key } from "react";
 import { Schema } from "@/../amplify/data/resource";
 import { loginStatus } from "@/components/LoginStatus";
 import { useRouter } from "next/navigation";
-import {
-  Image,
-  Listbox,
-  ListboxItem,
-  SelectSection,
-  Tab,
-  Tabs,
-} from "@nextui-org/react";
-
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Divider,
-  Spacer,
-} from "@nextui-org/react";
 
 import { useTranslations } from "next-intl";
 
@@ -30,6 +13,7 @@ import TeamProfilePersonal from "@/components/profile/TeamProfilePersonal";
 import { useTeamContext } from "@/components/TeamContext";
 import SecurityProfile from "@/components/profile/SecurityComponent";
 import VerticalTabs from "@/components/VerticalTab";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -54,32 +38,32 @@ export default function ProfilePage() {
           </div>
           {section == "basic" && (
             <Card className="w-full">
-              <CardBody>
+              <CardContent>
                 <div className="flex  justify-start flex-growth items-center ">
                   <UserProfile />
                 </div>
-              </CardBody>
+              </CardContent>
             </Card>
           )}
           {section == "team" && (
             <Card className="w-full">
-              <CardBody>
+              <CardContent>
                 <TeamProfilePersonal />
-              </CardBody>
+              </CardContent>
             </Card>
           )}
           {section == "security" && (
             <Card className="w-full">
-              <CardBody>
+              <CardContent>
                 <SecurityProfile />
-              </CardBody>
+              </CardContent>
             </Card>
           )}
         </div>
 
         <div className="w-40 justify-end flex mt-10">
           <Card>
-            <CardBody>
+            <CardContent>
               <div className="flex  justify-center items-center">
                 <VerticalTabs
                   tabs={tabList}
@@ -88,7 +72,7 @@ export default function ProfilePage() {
                   }}
                 />
               </div>
-            </CardBody>
+            </CardContent>
           </Card>
         </div>
       </div>

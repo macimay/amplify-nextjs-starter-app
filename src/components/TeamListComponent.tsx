@@ -2,8 +2,15 @@ import { useEffect, useState } from "react";
 import { loginStatus } from "./LoginStatus";
 import { SelectionSet, generateClient } from "aws-amplify/api";
 import { Schema } from "../../amplify/data/resource";
-import { Listbox, ListboxItem } from "@nextui-org/react";
+
 import { useTeamContext } from "./TeamContext";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
 
 export default function TeamListComponent({
   callback,
@@ -39,20 +46,22 @@ export default function TeamListComponent({
 
   return (
     <div>
-      <Listbox aria-label="Team List" items={teamList}>
-        {(team) => (
-          <ListboxItem
-            key={team.team.id}
-            value={team.team.id}
-            onClick={() => {
-              console.log("team selected:", team);
-              callback(team.team);
-            }}
-          >
-            {team.team.name}
-          </ListboxItem>
-        )}
-      </Listbox>
+      <Command aria-label="Team List">
+        <CommandGroup>
+          {teamList.map((team) => (
+            <CommandItem
+              key={team.team.id}
+              value={team.team.id}
+              onSelect={(currentValue) => {
+                console.log("team selected:", currentValue);
+                callback(currentValue);
+              }}
+            >
+              {team.team.name}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </Command>
     </div>
   );
 }

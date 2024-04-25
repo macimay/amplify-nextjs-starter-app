@@ -8,12 +8,12 @@ import UserListComponent, {
 } from "@/components/UserListComponent";
 import UserDetailComponent from "@/components/UserDetailComponent";
 import { loginStatus } from "@/components/LoginStatus";
-import { Divider } from "@nextui-org/react";
+
 import { useTeamContext } from "@/components/TeamContext";
 
 export default function OrderPage() {
   const { session } = useTeamContext();
-  const [orderList, setOrderList] = useState<Schema["PackageOrder"][]>([]);
+  const [orderList, setOrderList] = useState<Schema["SubscriptionOrder"][]>([]);
   useEffect(() => {}, []);
   return (
     <div className="flex flex-row w-full h-full">

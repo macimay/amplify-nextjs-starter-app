@@ -38,10 +38,10 @@ export default function SubscriptionDetail({
     "availableAt",
     "expireAt",
     "expireInDays",
-    "packages.productPackage.id",
-    "packages.productPackage.name",
-    "packages.productPackage.description",
-    "packages.productPackage.product.name",
+
+    "packages.product.id",
+    "packages.product.name",
+    "packages.description",
   ] as const;
   type SubscriptionDetailDataType = SelectionSet<
     Schema["Subscriptions"],
@@ -49,6 +49,8 @@ export default function SubscriptionDetail({
   >;
 
   const [subscription, setSubscription] = useState<SubscriptionsType>();
+  const [subscriptionData, setSubscriptionData] =
+    useState<Schema["Subscriptions"]>();
   const [subscriptionDetail, setSubscriptionDetail] =
     useState<SubscriptionDetailDataType>();
 
@@ -102,6 +104,7 @@ export default function SubscriptionDetail({
                 description: values.description,
                 region: values.region,
                 publish: values.publish,
+                priority: values.priority,
                 isExpired: values.expireInfo.isExpire,
                 availableAt: values.expireInfo.availableAt,
                 expireAt: values.expireInfo.expireAt,
@@ -142,27 +145,54 @@ export default function SubscriptionDetail({
           <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
             Packages
           </h2>
+          <div className="flex flex-row gap-4">
+            {subscription && (
+              <PackagesSelectionComponent
+                mode="remove"
+                subscriptionId={subscription?.id}
+                filterType="region"
+                filterValue={subscription?.region || "GLOBAL"}
+                onSubmitCallback={(selectedPackages) => {
+                  console.log("selectedPackages:", selectedPackages);
 
-          {subscription && (
-            <PackagesSelectionComponent
-              packagesSelected={[]}
-              filterType="region"
-              filterValue={subscription?.region || "GLOBAL"}
-              onSubmitCallback={(selectedPackages) => {
-                console.log("selectedPackages:", selectedPackages);
-
-                const client = generateClient<Schema>({ authMode: "apiKey" });
-                selectedPackages.map((p) => {
-                  client.models.ProductPackageSubscriptions.create({
-                    productPackageId: p.id,
-                    subscriptionsId: subscription.id,
-                  }).then((data) => {
-                    console.log("update package:", data);
+                  const client = generateClient<Schema>({ authMode: "apiKey" });
+                  selectedPackages.map((p) => {
+                    // const productPackage = subscriptionData?.packages?.find(
+                    //   "id",
+                    //   p.id
+                    // );
+                    client.models.ProductPackage.update({
+                      id: p.id,
+                      subscriptionsPackagesId: undefined,
+                    }).then((data) => {
+                      console.log("data:", data);
+                    });
                   });
-                });
-              }}
-            />
-          )}
+                }}
+              />
+            )}
+            {subscription && (
+              <PackagesSelectionComponent
+                mode="add"
+                subscriptionId={subscription?.id}
+                filterType="region"
+                filterValue={subscription?.region || "GLOBAL"}
+                onSubmitCallback={(selectedPackages) => {
+                  console.log("selectedPackages:", selectedPackages);
+
+                  const client = generateClient<Schema>({ authMode: "apiKey" });
+                  selectedPackages.map((p) => {
+                    client.models.ProductPackage.update({
+                      id: p.id,
+                      subscriptionsPackagesId: subscription.id,
+                    }).then((data) => {
+                      console.log("update package:", data);
+                    });
+                  });
+                }}
+              />
+            )}
+          </div>
         </div>
         <div>
           <Table>
@@ -176,15 +206,11 @@ export default function SubscriptionDetail({
             </TableHeader>
             <TableBody>
               {subscriptionDetail?.packages.map((packageDetail) => (
-                <TableRow key={packageDetail.productPackage.id}>
-                  <TableCell>{packageDetail.productPackage.id}</TableCell>
-                  <TableCell>{packageDetail.productPackage.name}</TableCell>
-                  <TableCell>
-                    {packageDetail.productPackage.description}
-                  </TableCell>
-                  <TableCell>
-                    {packageDetail.productPackage.product.name}
-                  </TableCell>
+                <TableRow key={packageDetail?.product?.id}>
+                  <TableCell>{packageDetail?.product?.id}</TableCell>
+                  <TableCell>{packageDetail?.product?.name}</TableCell>
+                  <TableCell>{packageDetail?.description}</TableCell>
+                  <TableCell>{packageDetail?.product?.name}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

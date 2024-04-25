@@ -63,7 +63,7 @@ export default function ProductDescriptionList({
         </TableHeader>
         <TableBody>
           {descriptions.map((description) => (
-            <TableRow>
+            <TableRow key={description.id}>
               <TableCell>{description.id.substring(0, 8)}</TableCell>
               <TableCell>{description.description}</TableCell>
               <TableCell>

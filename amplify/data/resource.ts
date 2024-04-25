@@ -1,4 +1,6 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { profile } from "console";
+import { getPriority } from "os";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -38,6 +40,8 @@ const schema = a.schema({
       admin: a.hasOne("User").required(),
       level: a.integer().default(0).required(),
       region: a.ref("SubscriptionRegion").required(),
+
+      subscriptions: a.hasMany("SubscriptionPool"),
     })
     .authorization([
       a.allow.public().to(["read", "create", "delete", "update"]),
@@ -105,39 +109,41 @@ const schema = a.schema({
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
-  ProductPool: a
+  SubscriptionPool: a
     .model({
-      teamId: a.string().required(),
+      team: a.belongsTo("Team"),
+      subscription: a.hasOne("Subscriptions").required(),
       package: a.hasOne("ProductPackage").required(),
-      count: a.integer().required(),
-      // usage: a.hasMany("ProductUsage"),
+      history: a.hasMany("subscriptionPoolHistory"),
 
-      unit: a.ref("PackageUnit").required(),
-      period: a.ref("Periodic").required(),
       used: a.integer().required(),
+      periodicStart: a.datetime().required(),
+      periodicEnd: a.datetime(),
+      capacity: a.integer().required(),
       priority: a.integer().required(),
       status: a.ref("Status").required(),
       startAt: a.datetime(),
       expireAt: a.datetime(),
+      updateAt: a.datetime(),
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
-  ProductUsage: a
+  subscriptionPoolHistory: a
     .model({
       teamId: a.string().required(),
-      // pool: a.belongsTo("ProductPool"),
+      packageId: a.string().required(),
       used: a.integer().required(),
-      lastUpdateAt: a.datetime(),
-      StartAt: a.datetime(),
+      periodicStart: a.datetime(),
+      periodicEnd: a.datetime(),
+      capacity: a.integer().required(),
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 
   Subscriptions: a
     .model({
       name: a.string().required(),
-      packages: a.manyToMany("ProductPackage", {
-        relationName: "ProductPackageSubscriptions",
-      }),
+      packages: a.hasMany("ProductPackage"),
+
       price: a.float().required(),
       currency: a.ref("PriceCurrency").required(),
       period: a.ref("Periodic").required(),
@@ -148,33 +154,33 @@ const schema = a.schema({
       region: a.ref("SubscriptionRegion").required(),
       level: a.integer().required(),
       isExpired: a.ref("ExpireType").required(),
+      isTrial: a.boolean().default(false),
+      priority: a.integer().required(),
 
       availableAt: a.date(),
       expireAt: a.date(),
       expireInDays: a.integer(),
       publish: a.boolean().default(true).required(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .authorization([
+      a.allow.public().to(["read", "create", "update", "delete"]),
+    ]),
 
-  TeamSubscription: a
+  TeamSubscriptions: a
     .model({
       team: a.hasOne("Team"),
-      premier: a.ref("Subscriptions").required(),
-      packages: a.hasMany("ProductPackage"),
-      count: a.integer().required(),
-      status: a.ref("Status").required(),
-      startAt: a.datetime(),
-      expireAt: a.datetime(),
-      resetDate: a.datetime(),
+      subscription: a.hasOne("Subscriptions"),
+      availableAt: a.datetime().required(),
+      expireAt: a.datetime().required(),
+      priority: a.integer().required(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .authorization([
+      a.allow.public().to(["read", "create", "update", "delete"]),
+    ]),
 
   ProductPackage: a
     .model({
       product: a.belongsTo("Product"),
-      subscriptions: a.manyToMany("Subscriptions", {
-        relationName: "ProductPackageSubscriptions",
-      }),
       name: a.string().required(),
       count: a.integer().required(),
       unit: a.ref("PackageUnit").required(),
@@ -189,7 +195,9 @@ const schema = a.schema({
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .authorization([
+      a.allow.public().to(["read", "create", "update", "delete"]),
+    ]),
 
   SubscriptionOrder: a
     .model({
@@ -201,6 +209,25 @@ const schema = a.schema({
       count: a.integer().required(),
       amount: a.float().required(),
       createAt: a.datetime().required(),
+    })
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
+
+  Document: a
+    .model({
+      title: a.string().required(),
+      type: a.string().required(),
+      tags: a.hasMany("DocumentTag"),
+      content: a.string().required(),
+      createdAt: a.datetime().required(),
+      updatedAt: a.datetime().required(),
+      language: a.string().required(),
+    })
+    .authorization([a.allow.public().to(["read", "create", "update"])]),
+
+  DocumentTag: a
+    .model({
+      name: a.string().required(),
+      type: a.string().required(),
     })
     .authorization([a.allow.public().to(["read", "create", "update"])]),
 });

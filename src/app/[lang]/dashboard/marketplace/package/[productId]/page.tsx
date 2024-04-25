@@ -3,7 +3,7 @@
 import { generateClient } from "aws-amplify/api";
 import { useEffect, useState } from "react";
 import { Schema } from "@/../amplify/data/resource";
-import ProductPageDetailComponent from "@/components/ProductPageDetailComponent";
+import ProductPageDetailComponent from "@/components/ProductDescriptionComponent";
 import CheckoutComponent from "@/components/CheckoutComponent";
 
 export default function ProductPackagePage({
@@ -26,7 +26,12 @@ export default function ProductPackagePage({
 
   return (
     <div className="flex flex-row">
-      {product && <ProductPageDetailComponent product={product} />}
+      {product && (
+        <ProductPageDetailComponent
+          productId={product.id}
+          descriptions={product.description!}
+        />
+      )}
 
       <div>{product && <CheckoutComponent product={product} />}</div>
     </div>

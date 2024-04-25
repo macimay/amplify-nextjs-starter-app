@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { FileTerminalIcon } from "lucide-react";
 
 export default function PackageListComponent({
   filterType,
@@ -111,7 +112,11 @@ export default function PackageListComponent({
             <TableCell>{p.name}</TableCell>
 
             <TableCell>
-              <Link href={{ pathname: `/admin/packages/detail/${p.id}` }}>
+              <Link
+                href={{
+                  pathname: `/admin/packages/detail/${filterValue}/${p.id}`,
+                }}
+              >
                 编辑
               </Link>
             </TableCell>

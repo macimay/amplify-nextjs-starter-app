@@ -2,29 +2,8 @@
 
 import { useTranslations } from "next-intl";
 
-import {
-  Image,
-  Link,
-  NavbarMenu,
-  Select,
-  Spacer,
-  Tab,
-  Tabs,
-} from "@nextui-org/react";
-
 // components/NavigationBar.js
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  Button,
-  DropdownItem,
-  DropdownTrigger,
-  Dropdown,
-  DropdownMenu,
-} from "@nextui-org/react";
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 
 import ThemeSwitcher from "./ThemeSwitcher";
 import { HeartIcon, HomeModernIcon } from "@heroicons/react/24/outline";
@@ -35,6 +14,31 @@ import { usePathname, useRouter } from "@/navigation";
 import { Authenticator } from "@aws-amplify/ui-react";
 
 import { useTeamContext } from "./TeamContext";
+
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuRadioGroup,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { Separator } from "./ui/separator";
+import { cn } from "@/lib/utils";
+
+import { Dropdown } from "react-day-picker";
 
 export default function NavigationBar() {
   const t = useTranslations("Navigation");
@@ -47,7 +51,6 @@ export default function NavigationBar() {
     // Fix: Remove the object wrapper around newLocale
     router.push(pathname, { locale: newLocale });
   };
-
   const { session } = useTeamContext();
 
   const menus = {
@@ -91,111 +94,131 @@ export default function NavigationBar() {
     <Authenticator>
       {({ signOut, user }) => {
         return (
-          <div className="flex flex-col container">
-            <Navbar maxWidth="full">
-              <NavbarBrand>
-                <Image src="/assets/picture/logo.png" alt="logo" />
-              </NavbarBrand>
-              <NavbarContent className="hidden sm:flex gap-4" justify="start">
-                <NavbarItem>
-                  <Button
-                    as={Link}
+          <div className="flex flex-row items-center justify-between px-4 py-2 w-full">
+            <NavigationMenu>
+              <NavigationMenuList className="hidden sm:flex gap-4">
+                <NavigationMenuItem>
+                  <Link
                     href="/dashboard/workspace"
                     color="primary"
-                    variant={
-                      pathname.indexOf("/dashboard/workspace") >= 0
-                        ? "solid"
-                        : "flat"
-                    }
+                    legacyBehavior
+                    passHref
                   >
-                    {t("workspace")}
-                  </Button>
-                </NavbarItem>
-                <NavbarItem>
-                  <Link href="/dashboard/marketplace" color="primary">
-                    {t("marketplace")}
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      {t("workspace")}
+                    </NavigationMenuLink>
                   </Link>
-                </NavbarItem>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/dashboard/marketplace" color="primary">
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      {t("marketplace")}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
 
-                <NavbarItem>
-                  <Link href="/dashboard/practice">{t("practice")}</Link>
-                </NavbarItem>
-                <NavbarItem>
-                  <Link href="/dashboard/document">{t("documents")}</Link>
-                </NavbarItem>
-                <NavbarItem>
-                  <Link href="/dashboard/team">{t("teamInfo")}</Link>
-                </NavbarItem>
-              </NavbarContent>
-              <NavbarContent justify="end">
-                <Dropdown>
-                  <NavbarItem>
-                    <DropdownTrigger>
-                      <div className="flex items-center flex-row">
-                        <Image
-                          src="https://gravatar.com/avatar/0c9997d53bad0e7f2a0b25bb9b1888b5?s=400&d=robohash&r=x"
-                          width={16}
-                          alt="avatar"
-                        />
-                        <p>{session.relation.team?.name}</p>
-                      </div>
-                    </DropdownTrigger>
-                  </NavbarItem>
-                  <DropdownMenu
-                    aria-label="ACME features"
-                    className="w-[340px]"
-                    itemClasses={{
-                      base: "gap-4",
-                    }}
-                  >
-                    <DropdownItem key="teamSwitch" textValue="teamSwitch">
-                      <Link href="/profile">{t("profile")}</Link>
-                    </DropdownItem>
-                    <DropdownItem key="logout" textValue="signOut">
-                      <Link
-                        color="primary"
-                        onClick={() => {
-                          signOut;
-                        }}
-                      >
-                        {t("signOut")}
-                      </Link>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-                <Spacer x={2} />
-                <NavbarItem>
-                  <ThemeSwitcher />
-                </NavbarItem>
-                <Dropdown>
-                  <DropdownTrigger className="flex items-center">
-                    <LanguageIcon className="h-6 w-6" />
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    onAction={(key) => handleLanguageChange(String(key))}
-                    aria-label="nav_menu_lang"
-                  >
-                    <DropdownItem value="en" key="en" aria-label="en">
-                      <p>English</p>
-                    </DropdownItem>
-                    <DropdownItem value="cn" key="cn" aria-label="cn">
-                      <p>简体中文</p>
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </NavbarContent>
-            </Navbar>
+                <NavigationMenuItem>
+                  <Link href="/dashboard/practice">
+                    <NavigationMenuLink>{t("practice")}</NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/dashboard/document">
+                    <NavigationMenuLink>{t("documents")}</NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/dashboard/team">
+                    <NavigationMenuLink>{t("teamInfo")}</NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
 
-            {pathname.indexOf("/dashboard/team") >= 0 && (
-              <Tabs>
-                {menus.team.map((menu) => (
-                  <Tab key={menu.key} title={menu.title} href={menu.path} />
-                ))}
-              </Tabs>
-            )}
+            <div className="flex flex-row justify-end items-center gap-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <div className="flex items-center flex-row">
+                    <img
+                      src="https://gravatar.com/avatar/0c9997d53bad0e7f2a0b25bb9b1888b5?s=400&d=robohash&r=x"
+                      width={16}
+                      alt="avatar"
+                    />
+                    <p>{session.relation.team?.name}</p>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem key="teamSwitch" title="teamSwitch">
+                    {t("profile")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem key="logout" title="signOut">
+                    {t("signOut")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <ThemeSwitcher />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center">
+                  <LanguageIcon className="h-6 w-6" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuRadioGroup onValueChange={handleLanguageChange}>
+                    <DropdownMenuRadioItem value="en" aria-label="ENGLISH">
+                      ENGLISH
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      value="cn"
+                      aria-label="cn"
+                      title="简体中文"
+                    >
+                      简体中文
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
+
+          // {/* {pathname.indexOf("/dashboard/team") >= 0 && (
+          //   <Tabs>
+          //     {menus.team.map((menu) => (
+          //       <Tab key={menu.key} title={menu.title} href={menu.path} />
+          //     ))}
+          //   </Tabs>
+          // )} */}
         );
       }}
     </Authenticator>
   );
 }
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
+ListItem.displayName = "ListItem";

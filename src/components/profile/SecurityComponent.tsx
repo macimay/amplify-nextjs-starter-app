@@ -1,21 +1,15 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { User } from "../UserListComponent";
 import { useState } from "react";
-import {
-  Button,
-  Card,
-  CardBody,
-  Divider,
-  Image,
-  Spacer,
-  Input,
-} from "@nextui-org/react";
+
 import { Schema } from "../../../amplify/data/resource";
 import { useTranslations } from "next-intl";
 import { ProfileItem, UpdateProfileItemFunc } from "./ProfileItem";
 import { generateClient } from "aws-amplify/api";
 import { useTeamContext } from "../TeamContext";
 import Profile from "../Profile";
+import { Separator } from "@radix-ui/react-select";
+import { Card, CardContent } from "../ui/card";
 
 export default function SecurityProfile() {
   const { session } = useTeamContext();
@@ -43,7 +37,7 @@ export default function SecurityProfile() {
   return (
     <div className="flex flex-col justify-start items-start w-[640px]">
       <Card className="w-full">
-        <CardBody>
+        <CardContent>
           <div className="flex flex-col justify-center items-center gap-4">
             <ProfileItem
               name="teamName"
@@ -51,7 +45,7 @@ export default function SecurityProfile() {
               value={team.name}
               callback={update}
             />
-            <Divider />
+            <Separator />
             <ProfileItem
               name="teamAlias"
               label={t("LabelTeamAlias")}
@@ -72,7 +66,7 @@ export default function SecurityProfile() {
               readonly
             />
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
     </div>
   );

@@ -44,6 +44,7 @@ export async function createTeam({ teamName }: { teamName: string }) {
       name: teamName,
       teamAdminId: userBrief.sub!,
       level: 0,
+      region: "CN",
     });
   if (team == null) {
     throw {
@@ -117,7 +118,6 @@ export async function joinTeamByInvite({ inviteCode }: { inviteCode: string }) {
       status: "ACTIVE",
     });
 
-  console.log("join team:", invite.team);
   return invite.team;
 }
 async function checkTeamAvailable({
@@ -157,12 +157,26 @@ export async function requestInviteCode(teamId: string, refresh: boolean) {
   });
   if (refresh) {
     console.log("refresh invite code");
-    await cookieBasedClient.models.InviteCode.delete({
-      teamId: teamId,
-    });
-    const code = createInviteCode(teamId);
+    const { data: inviteCode, errors: codeGetError } =
+      await cookieBasedClient.models.InviteCode.list({
+        filter: {
+          inviteCodeTeamId: { eq: teamId },
+        },
+        selectionSet: ["id"],
+      });
+    if (codeGetError) {
+      console.log("get invite code failed");
+    } else if (inviteCode.length > 0) {
+      await cookieBasedClient.models.InviteCode.delete({
+        id: inviteCode[0].id!,
+      });
+      const code = createInviteCode(teamId);
 
-    return { code: code };
+      return { code: code };
+    } else {
+      const code = createInviteCode(teamId);
+      return { code: code };
+    }
   } else {
     //return old ones
     const { data: inviteCode, errors: codeGetError } =

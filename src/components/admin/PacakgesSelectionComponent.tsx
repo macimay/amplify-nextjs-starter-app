@@ -11,6 +11,7 @@ import {
 
 import { Button } from "../ui/button";
 import PlusIcon from "@heroicons/react/24/outline/PlusIcon";
+import MinusIcon from "@heroicons/react/24/outline/MinusIcon";
 import { useEffect, useState } from "react";
 import { SelectionSet, generateClient } from "aws-amplify/api";
 import { Schema } from "../../../amplify/data/resource";
@@ -22,6 +23,8 @@ import {
   TableRow,
 } from "../ui/table";
 import { sub } from "date-fns";
+import { SelectArrow } from "@radix-ui/react-select";
+import { Minus, Subscript } from "lucide-react";
 const selectionSet = [
   "id",
   "name",
@@ -35,12 +38,15 @@ export type PackageSelectionSet = SelectionSet<
 >;
 
 export default function PackagesSelectionComponent({
-  packagesSelected,
+  mode,
+  subscriptionId,
+
   filterType,
   filterValue,
   onSubmitCallback,
 }: {
-  packagesSelected: string[];
+  mode: "add" | "remove";
+  subscriptionId: string;
   filterType: string;
   filterValue: string;
   onSubmitCallback: (packages: PackageSelectionSet[]) => void;
@@ -50,12 +56,14 @@ export default function PackagesSelectionComponent({
     PackageSelectionSet[]
   >([]);
   useEffect(() => {
-    console.log("packagesSelected:", packagesSelected);
+    console.log("packagesSelected:", mode, " ", subscriptionId);
     console.log("filterType:", filterType, "filter value:", filterValue);
     const client = generateClient<Schema>({ authMode: "apiKey" });
     client.models.ProductPackage.list({
       filter: {
         [filterType]: { eq: filterValue },
+        subscriptionsPackagesId:
+          mode === "add" ? { ne: subscriptionId } : { eq: subscriptionId },
       },
       selectionSet: ["id", "name", "product.*", "description", "region"],
     }).then((data) => {
@@ -68,12 +76,12 @@ export default function PackagesSelectionComponent({
     <div>
       <Dialog>
         <DialogTrigger>
-          <PlusIcon width={24} />
+          {mode == "add" ? <PlusIcon width={24} /> : <MinusIcon width={24} />}
         </DialogTrigger>
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Packages to Subscription</DialogTitle>
+            <DialogTitle>{mode} Packages to Subscription</DialogTitle>
           </DialogHeader>
 
           <Table>
@@ -87,26 +95,30 @@ export default function PackagesSelectionComponent({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {packages.map((p) => (
-                <TableRow
-                  key={p.id}
-                  data-state={packages.includes(p) ? "selected" : "unselected"}
-                  onClick={() => {
-                    if (selectedPackages.includes(p)) {
-                      setSelectedPackages((prev) =>
-                        prev.filter((item) => item.id !== p.id)
-                      );
-                    } else {
-                      setSelectedPackages((prev) => [...prev, p]);
+              {packages.map((p) => {
+                return (
+                  <TableRow
+                    key={p.id}
+                    data-state={
+                      selectedPackages.includes(p) ? "selected" : "unselected"
                     }
-                  }}
-                >
-                  <TableCell>{p.name}</TableCell>
-                  <TableCell>{p.product.name}</TableCell>
-                  <TableCell>{p.description}</TableCell>
-                  <TableCell>{p.region}</TableCell>
-                </TableRow>
-              ))}
+                    onClick={() => {
+                      if (selectedPackages.includes(p)) {
+                        setSelectedPackages((prev) =>
+                          prev.filter((item) => item.id !== p.id)
+                        );
+                      } else {
+                        setSelectedPackages((prev) => [...prev, p]);
+                      }
+                    }}
+                  >
+                    <TableCell>{p.name}</TableCell>
+                    <TableCell>{p.product.name}</TableCell>
+                    <TableCell>{p.description}</TableCell>
+                    <TableCell>{p.region}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
           <DialogFooter>
@@ -116,7 +128,7 @@ export default function PackagesSelectionComponent({
                 onSubmitCallback(packages);
               }}
             >
-              Add
+              {mode}
             </Button>
           </DialogFooter>
         </DialogContent>

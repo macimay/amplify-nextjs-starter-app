@@ -10,18 +10,12 @@ import {
   initializeUserSession,
   updateSession,
 } from "@/app/[lang]/dashboard/user/action";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Divider,
-  Spacer,
-} from "@nextui-org/react";
+
 import { loginStatus } from "@/components/LoginStatus";
 import { useRouter } from "next/navigation";
 import { useTeamContext } from "@/components/TeamContext";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 export default function DashboardLoading() {
   const router = useRouter();
@@ -67,17 +61,17 @@ export default function DashboardLoading() {
     return (
       <>
         {stage === "UserIsFresh" && (
-          <div className="flex flex-col w-full h-full justify-start items-center bg-red-500">
+          <div className="flex flex-col w-full h-full justify-start items-center">
             <div>
               <div className="text-base">
                 <p>{t("WelcomeFreshNew")}</p>
               </div>
-              <Spacer y={20} />
+              <Separator className="my-20" />
               <Card>
-                <Divider />
-                <CardBody>
+                <Separator />
+                <CardContent>
                   <WelcomeComponent />
-                </CardBody>
+                </CardContent>
                 <CardFooter></CardFooter>
               </Card>
             </div>

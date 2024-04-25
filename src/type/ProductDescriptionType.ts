@@ -1,25 +1,29 @@
-import { image } from "@nextui-org/react";
-import { Schema } from "../../amplify/data/resource";
 import { IBaseData, RegionArray } from "./IBaseData";
 import { InputDefineType } from "./InputDefineType";
 import { FileInput } from "lucide-react";
 import { z } from "zod";
 import { OptionInputDefineType } from "./OptionInputDefineType";
+import { Schema } from "@/../amplify/data/resource";
 export class ProductDescriptionType implements IBaseData {
   id: string;
 
   description: string | null | undefined;
   imageKey: string | null | undefined;
   publish: boolean = true;
+  region: string = "CN";
 
   constructor(
     id: string,
     description: string | null | undefined,
-    imageKey: string | null | undefined
+    imageKey: string | null | undefined,
+    publish: boolean = true,
+    region: string = "CN"
   ) {
     this.id = id;
     this.description = description;
-    this.imageKey = "";
+    this.imageKey = imageKey;
+    this.publish = publish;
+    this.region = region;
   }
 
   static createEmpty(): ProductDescriptionType {
@@ -28,10 +32,13 @@ export class ProductDescriptionType implements IBaseData {
   static fromProductDescription(
     productDescription: Schema["ProductDescription"]
   ): ProductDescriptionType {
+    console.log("xxxproductDescription xxx:", productDescription);
     return new ProductDescriptionType(
       productDescription.id!,
       productDescription.description,
-      productDescription.imageKey
+      productDescription.imageKey,
+      productDescription.publish,
+      productDescription.region
     );
   }
   formStructure(): InputDefineType[] {

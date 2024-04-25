@@ -24,6 +24,8 @@ import {
 
 import PackageListComponent from "@/components/admin/PackageListComponent";
 import ProductDescriptionList from "@/components/admin/ProductDescriptionList";
+import { Plus, PlusIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function ProductPage({
   params,
@@ -129,14 +131,9 @@ export default function ProductPage({
         <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
           Product Package List
         </h2>
-        <Button
-          asChild
-          onClick={() => {
-            router.push(`/admin/packages/detail/${product?.id}`);
-          }}
-        >
-          <img src="/assets/picture/plus.png" width={24} height={24} />
-        </Button>
+        <Link href={`/admin/packages/detail/${product?.id}`}>
+          <PlusIcon size={24} />
+        </Link>
       </div>
 
       {product && (

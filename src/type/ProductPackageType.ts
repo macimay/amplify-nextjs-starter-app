@@ -57,7 +57,7 @@ export class ProductPackageType implements IBaseData {
     );
   }
   static createEmpty(productId: string): ProductPackageType {
-    return new ProductPackageType("", productId, "hello", 0, "TIMES");
+    return new ProductPackageType("", productId, "", 0, "TIMES");
   }
   formStructure(): InputDefineType[] {
     return [
@@ -88,6 +88,7 @@ export class ProductPackageType implements IBaseData {
       id: z.string().optional(),
       productId: z.string(),
       name: z.string().min(3),
+      description: z.string().optional(),
       count: z.coerce.number().int().min(1),
       unit: z.enum(["TIMES", "SECOND"]),
       region: z.enum(RegionArray),

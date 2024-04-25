@@ -20,22 +20,26 @@ import { useState } from "react";
 import S3Image from "../S3Image";
 
 export default function FileFormField({
+  key,
   s3ImageKey,
   control,
-  item,
   ref,
+  item,
+
   ...props
 }: {
+  key: string;
   s3ImageKey: string;
   control: Control<any, any>;
-  item: InputDefineType;
   ref: any;
+  item: InputDefineType;
 }) {
   const [imageKey, setImageKey] = useState<string | undefined>(undefined);
 
   return (
     <FormField
       {...props}
+      key={item.key}
       name={item.key}
       control={control}
       render={({ field }) => (

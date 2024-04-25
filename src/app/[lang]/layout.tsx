@@ -16,6 +16,10 @@ import { TeamWrapper } from "@/components/TeamContext";
 import { cn } from "@/lib/utils";
 import { Inter as FontSans } from "next/font/google";
 
+import GlobalError from "@/app/[lang]/global-error";
+import LayoutError from "@/app/[lang]/global-error";
+import ErrorBoundary from "next/dist/client/components/error-boundary";
+
 // import AuthCheck from "./components/AuthCheck";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -46,6 +50,7 @@ function RootLayout({
         )}
       >
         <AmplifyInit />
+
         <NextIntlClientProvider messages={t}>
           <Providers>
             <TeamWrapper>{children}</TeamWrapper>

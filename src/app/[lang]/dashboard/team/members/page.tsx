@@ -8,22 +8,22 @@ import UserListComponent, {
 } from "@/components/UserListComponent";
 import UserDetailComponent from "@/components/UserDetailComponent";
 import { loginStatus } from "@/components/LoginStatus";
-import { Divider } from "@nextui-org/react";
+
 import { useTeamContext } from "@/components/TeamContext";
 
 export default function TeamMemberPage() {
   const [userList, setUserList] = useState<User[]>([]);
   const [user, setActiveUser] = useState<User>();
-  const { team } = useTeamContext();
+  const { session } = useTeamContext();
 
   useEffect(() => {
-    console.log("loginStatus.activeTeamId:", team.id);
+    console.log("loginStatus.activeTeamId:", session.relation.team.id);
     const client = generateClient<Schema>({
       authMode: "apiKey",
     });
 
     client.models.TeamMember.list({
-      filter: { teamMemberTeamId: { eq: team.id } },
+      filter: { teamMemberTeamId: { eq: session.relation.team.id } },
       selectionSet: [
         "user.id",
         "user.username",

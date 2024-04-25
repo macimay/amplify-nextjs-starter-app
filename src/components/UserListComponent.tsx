@@ -1,4 +1,6 @@
-import { Listbox, ListboxItem, User } from "@nextui-org/react";
+import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar } from "./ui/avatar";
+
 export enum UserStatus {
   ACTIVE = "ACTIVE",
   SUSPEND = "SUSPEND",
@@ -21,28 +23,23 @@ export default function userListComponent({
 }) {
   return (
     <>
-      <div className="border-small px-1 py-2 rounded-small border-default-200 dark:border-default-100">
-        <Listbox
-          classNames={{
-            base: "max-w-xs",
-            list: "max-h-[300px] overflow-scroll",
-          }}
-          items={userList}
-          variant="bordered"
-        >
-          {(user) => (
-            <ListboxItem
-              key={user.id}
-              value={user.id}
+      <div className="flex flex-col border-small px-1 py-2 rounded-small border-default-200 dark:border-default-100">
+        <div>
+          {userList.map((user) => (
+            <div
+              id={user.id}
               aria-label={user.name}
               onClick={() => onUserChange(user)}
             >
               <div className="flex gap-2 items-center">
-                <User name={user.name} avatarProps={{ src: user.avatar }} />
+                <Avatar>
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback>{user.name}</AvatarFallback>
+                </Avatar>
               </div>
-            </ListboxItem>
-          )}
-        </Listbox>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

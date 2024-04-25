@@ -1,17 +1,13 @@
 "use client";
 // src/components/Sidebar.tsx
 import React, { useState } from "react";
-import {
-  Button,
-  Spacer,
-  Image,
-  Link,
-  Listbox,
-  ListboxItem,
-} from "@nextui-org/react";
+
 import { HomeModernIcon } from "@heroicons/react/16/solid";
 import type { ReactNode, SVGProps } from "react";
 import { useRouter } from "next/navigation";
+import { Separator } from "./ui/separator";
+import Link from "next/link";
+import Image from "next/image";
 
 // src/types/menuItem.ts
 export interface MenuItem {
@@ -25,7 +21,7 @@ export default function Sidebar({ items }: { items: MenuItem[] }) {
 
   const toggleSidebar = () => setIsExpanded(!isExpanded);
   const router = useRouter();
-  console.log("")
+  console.log("");
   return (
     <div
       style={{
@@ -39,11 +35,11 @@ export default function Sidebar({ items }: { items: MenuItem[] }) {
         alignItems: "center",
       }}
     >
-      <Spacer y={1} />
+      <Separator className="my-1" />
       <div>
-        <Listbox onChange={() => {}} aria-label="sidebar control">
+        <div onChange={() => {}} aria-label="sidebar control">
           {items.map((item, index) => (
-            <ListboxItem key={item.path} textValue={item.label}>
+            <div key={item.path}>
               <div className="flex flex-row">
                 <Image
                   src={item.icon}
@@ -51,11 +47,12 @@ export default function Sidebar({ items }: { items: MenuItem[] }) {
                   height={24}
                   alt={item.label}
                 />
+                {item.label}
                 {isExpanded && <Link href={item.path}>{item.label}</Link>}
               </div>
-            </ListboxItem>
+            </div>
           ))}
-        </Listbox>
+        </div>
       </div>
     </div>
   );

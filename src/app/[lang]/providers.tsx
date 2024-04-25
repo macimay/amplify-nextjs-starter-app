@@ -1,7 +1,6 @@
 "use client";
 
 // import { StrictMode } from "react";
-import { NextUIProvider } from "@nextui-org/react";
 
 // import { defaultTheme } from "@adobe/react-spectrum";
 

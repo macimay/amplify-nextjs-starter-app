@@ -15,6 +15,7 @@ export default function S3Image({
   useEffect(() => {
     if (s3Key !== undefined) {
       getUrl({ key: s3Key }).then((url) => {
+        console.log("S3Image url:", url);
         setImageUrl(url.url.href);
       });
     }

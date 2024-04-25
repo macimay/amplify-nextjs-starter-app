@@ -1,15 +1,5 @@
 "use client";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Divider,
-  Image,
-  Input,
-  Link,
-} from "@nextui-org/react";
+
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -26,6 +16,10 @@ import { Schema } from "../../amplify/data/resource";
 import { generateClient } from "aws-amplify/api";
 import { updateSession } from "@/app/[lang]/dashboard/user/action";
 import { getCurrentUser } from "aws-amplify/auth";
+import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Separator } from "@radix-ui/react-select";
 
 export default function WelcomeComponent() {
   const [stage, setState] = useState("Welcome");
@@ -96,11 +90,9 @@ export default function WelcomeComponent() {
                 </div>
                 <Card className="h-full">
                   <CardHeader>{t("TeamTitle")}</CardHeader>
-                  <CardBody>
+                  <CardContent>
                     <div>
                       <Input
-                        isClearable
-                        isRequired
                         placeholder={t("TeamInputPrompt")}
                         name="teamName"
                         value={teamName}
@@ -109,9 +101,9 @@ export default function WelcomeComponent() {
                         }}
                       />
                     </div>
-                  </CardBody>
+                  </CardContent>
                   <CardFooter className="justify-center gap-4">
-                    <Button type="submit">Create</Button>
+                    <Button type="submit">{t("TeamCreate")}</Button>
                   </CardFooter>
                 </Card>
               </div>
@@ -119,22 +111,22 @@ export default function WelcomeComponent() {
             <div>
               <p>或者</p>
             </div>
-            <Divider />
+            <Separator />
             <div className="flex flex-col justify-between  items-center items-stretch gap-4">
               <form onSubmit={handleInviteJoin}>
                 <Card>
                   <CardHeader>{t("inviteTitle")}</CardHeader>
-
-                  <Input
-                    placeholder={t("inviteInputPrompt")}
-                    value={inviteCode}
-                    onChange={(event) => {
-                      setInviteCode(event.target.value);
-                    }}
-                  />
-
+                  <CardContent>
+                    <Input
+                      placeholder={t("inviteInputPrompt")}
+                      value={inviteCode}
+                      onChange={(event) => {
+                        setInviteCode(event.target.value);
+                      }}
+                    />
+                  </CardContent>
                   <CardFooter className="justify-center gap-4">
-                    <Button type="submit">加入</Button>
+                    <Button type="submit">{t("TeamJoin")}</Button>
                   </CardFooter>
                 </Card>
               </form>

@@ -1,12 +1,14 @@
 "use client";
-import { Divider, Image } from "@nextui-org/react";
-import { useTransform } from "framer-motion";
+
+import { Separator } from "@radix-ui/react-select";
+
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 export default function Footer() {
   const t = useTranslations("Footer");
   return (
     <footer className="w-full h-20 mt-20 h-[200px]">
-      <Divider />
+      <Separator />
       <div className="flex flex-row m-20 justify-content space-x-10 ">
         <div className="flex flex-col space-y-4 ">
           <Image src="/assets/picture/logo.png" alt="logo" className="mb-4" />

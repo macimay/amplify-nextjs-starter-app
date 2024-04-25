@@ -49,6 +49,7 @@ import ExpireFormField from "./ExpireFormField";
 import UnitedValueFormField from "./UnitedValueFormField";
 import FileFormField from "./FileFormField";
 import SwitchFormField from "./SwitchFormField";
+import { Description } from "@radix-ui/react-dialog";
 
 export default function DetailForm({
   data,
@@ -58,6 +59,9 @@ export default function DetailForm({
   data: IBaseData;
   onSubmitCallback: (values: z.infer<z.ZodObject<any, any>>) => void;
 }) {
+  if (!data) {
+    return <></>;
+  }
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     data[event.target.name as keyof IBaseData] = event.target.value;
   };
@@ -78,6 +82,7 @@ export default function DetailForm({
   }
   const fileRef = form.register("file");
   console.log("DetailForm data:", data);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} id="form">

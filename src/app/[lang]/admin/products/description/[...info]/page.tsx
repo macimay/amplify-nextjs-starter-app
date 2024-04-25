@@ -8,6 +8,7 @@ import { uploadData } from "aws-amplify/storage";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { nullable } from "zod";
+import { useEffect, useState } from "react";
 
 export default function ProductDescriptionPage({
   params,
@@ -15,21 +16,30 @@ export default function ProductDescriptionPage({
   params: { info: string[] };
 }) {
   console.log("ProductDescriptionPage params:", params);
-  // const [description, setDescription] = useState<ProductDescriptionType>();
-  let description: ProductDescriptionType;
+  const [description, setDescription] = useState<ProductDescriptionType>();
+  // let description: ProductDescriptionType;
 
-  if (params.info.length === 2) {
-    const client = generateClient<Schema>({
-      authMode: "apiKey",
-    });
-    client.models.ProductDescription.get({
-      id: params.info[1],
-    }).then((result) => {
-      description = ProductDescriptionType.fromProductDescription(result.data);
-    });
-  } else {
-    description = ProductDescriptionType.createEmpty();
-  }
+  useEffect(() => {
+    console.log("ProductDescriptionPage useEffect:", params.info.length);
+    if (params.info.length == 2) {
+      console.log("get description");
+      const client = generateClient<Schema>({
+        authMode: "apiKey",
+      });
+      client.models.ProductDescription.get({
+        id: params.info[1],
+      }).then((result) => {
+        console.log("result:", result);
+        setDescription(
+          ProductDescriptionType.fromProductDescription(result.data)
+        );
+      });
+    } else {
+      console.log("create new description");
+      setDescription(ProductDescriptionType.createEmpty());
+    }
+    console.log("description:", description);
+  }, []);
 
   const router = useRouter();
 
@@ -40,9 +50,9 @@ export default function ProductDescriptionPage({
       <div className="flex flex-col">
         <div>
           {params.info[0] ? (
-            <p className="4xl-text">编辑介绍信息</p>
+            <p className="4xl-text">编辑介绍信息2</p>
           ) : (
-            <p className="4xl-text">新建介绍信息</p>
+            <p className="4xl-text">新建介绍信息1</p>
           )}
         </div>
         <Separator className="my-4" />

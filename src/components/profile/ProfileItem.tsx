@@ -1,5 +1,6 @@
-import { Input, Button, Image } from "@nextui-org/react";
 import { useState } from "react";
+import Image from "next/image";
+import { Input } from "../ui/input";
 
 export type UpdateProfileItemFunc = (
   key: string,

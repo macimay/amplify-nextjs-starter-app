@@ -15,6 +15,7 @@ import DetailForm from "@/components/admin/DetailForm";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { z } from "zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function DetailPage({
   params,
@@ -26,9 +27,9 @@ export default function DetailPage({
   console.log("DetailPage params:", params);
   const [productPackage, setProductPackage] = useState<ProductPackageType>();
   const editMode: boolean = params.packageInfo.length === 2;
+  const router = useRouter();
 
   useEffect(() => {
-    console.log("DetailPage useEffect packageId: ", params.packageInfo[1]);
     const client = generateClient<Schema>({
       authMode: "apiKey",
     });
@@ -43,6 +44,8 @@ export default function DetailPage({
             ProductPackageType.fromProductPackage(productPackage.data)
           );
         });
+      } else {
+        console.log("packageId is null");
       }
     } else {
       setProductPackage(ProductPackageType.createEmpty(params.packageInfo[0]));
@@ -100,6 +103,8 @@ export default function DetailPage({
                       expireInDays: values.expireInfo.expireInDays,
                     }).then((newPackage): void => {
                       console.log("new package:", newPackage);
+
+                      router.back();
                       //router.replace(`/admin/packages/detail/${newPackage.data.id}`);
                     });
                   } else {

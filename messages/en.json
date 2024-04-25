@@ -4,9 +4,9 @@
   },
   "Navigation": {
     "workspace": "Workspace",
-    "marketplace": "AI model List",
+    "marketplace": "MarketPlace",
     "lab": "Practice",
-    "document": "Document",
+    "documents": "Document",
     "signOut": "Sign Out",
     "profile": "Profile",
     "menuMain": "Main",
@@ -15,7 +15,8 @@
     "menuPrice": "Price",
     "menuOrder": "Order",
     "teamInfo": "Team Info",
-    "teamProperty": "Team Property"
+    "teamProperty": "Team Property",
+    "practice": "Lab"
   },
   "Footer": {
     "productTitle": "Product"
@@ -45,7 +46,12 @@
     "menuSetting": "Settings",
     "menuPrice": "Price",
     "memberInvite": "invite Member",
-    "memberInviteTitle": "You can invite your colleagues to create with you."
+    "memberInviteTitle": "You can invite your colleagues to create with you.",
+    "teamProperty": "Subscriptions",
+    "buyMore": "Buy More",
+    "tabIndex": "Index",
+    "tabMember": "Members",
+    "tabSetting": "Settings"
   },
   "Loading": {
     "WelcomeFreshNew": "Thanks for choosing us,please Wait a moment, we are loading the freshest and newest content for you.",
@@ -64,7 +70,9 @@
     "inviteInputPrompt": "Please enter the invitation code",
 
     "TeamTitle": "Welcome to create Team",
-    "TeamInputPrompt": "Please enter the team name"
+    "TeamInputPrompt": "Please enter the team name",
+    "TeamCreate": "Create Team",
+    "TeamJoin": "Join Team"
   },
   "ProfilePage": {
     "accountId": "Account ID",
@@ -101,5 +109,9 @@
     "LabelTeamAlias": "Team Alias",
     "LabelTeamRole": "Team Role",
     "LabelTeamTitle": "Team Title"
+  },
+  "MarketPlace": {
+    "ProductEntryDetail": "Details",
+    "ProductEntryTips": "Tips"
   }
 }

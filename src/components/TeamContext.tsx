@@ -12,12 +12,14 @@ export function TeamWrapper({ children }: { children: React.ReactNode }) {
     "userId",
     "relation.user.*",
     "relation.team.*",
+    "relation.team.subscriptions.*",
   ] as const;
   type SessionWithPackage = SelectionSet<
     Schema["UserSession"],
     typeof selectionSet
   >;
   let [session, setSession] = useState<SessionWithPackage>();
+  let [region, setRegion] = useState<string>("CN");
 
   useEffect(() => {
     console.log("TeamWrapper useEffect called");
@@ -53,7 +55,7 @@ export function TeamWrapper({ children }: { children: React.ReactNode }) {
     loginStatus.update(JSON.stringify(session));
   }, [session]);
   return (
-    <TeamContext.Provider value={{ session, setSession }}>
+    <TeamContext.Provider value={{ session, setSession, region, setRegion }}>
       {children}
     </TeamContext.Provider>
   );

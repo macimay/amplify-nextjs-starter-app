@@ -1,20 +1,15 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { User } from "../UserListComponent";
 import { useState } from "react";
-import {
-  Button,
-  Card,
-  CardBody,
-  Divider,
-  Image,
-  Spacer,
-  Input,
-} from "@nextui-org/react";
+
 import { Schema } from "../../../amplify/data/resource";
 import { useTranslations } from "next-intl";
 import { ProfileItem, UpdateProfileItemFunc } from "./ProfileItem";
 import { generateClient } from "aws-amplify/api";
 import { useTeamContext } from "../TeamContext";
+import { Separator } from "@radix-ui/react-select";
+import { Card, CardContent } from "../ui/card";
+import Image from "next/image";
 
 export default function UserProfile() {
   const { session, setSession } = useTeamContext();
@@ -45,7 +40,7 @@ export default function UserProfile() {
   return (
     <div className="flex flex-row justify-start w-[640px]">
       <Card>
-        <CardBody className="flex justify-center items-start">
+        <CardContent className="flex justify-center items-start">
           <div className="flex flex-col justify-center items-center w-[180px] ">
             <div className="flex flex-row justify-center items-center">
               <Image
@@ -55,13 +50,13 @@ export default function UserProfile() {
                 alt="avatar"
               />
             </div>
-            <Spacer y={8} />
+            <Separator className="my-8" />
             <p className="text-4xl">{user.username}</p>
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
       <Card className="w-[540px]">
-        <CardBody>
+        <CardContent>
           <div className="flex flex-col justify-center items-center gap-4">
             <ProfileItem
               name="username"
@@ -69,7 +64,7 @@ export default function UserProfile() {
               value={user.username}
               callback={update}
             />
-            <Divider />
+            <Separator />
             <ProfileItem
               name="accountId"
               label={t("accountId")}
@@ -77,14 +72,14 @@ export default function UserProfile() {
               readonly={true}
               callback={update}
             />
-            <Divider />
+            <Separator />
             <ProfileItem
               name="email"
               label={t("email")}
               value={user.email?.toString() ?? ""}
               callback={update}
             />
-            <Divider />
+            <Separator />
             <ProfileItem
               name="phone"
               label={t("phone")}
@@ -92,7 +87,7 @@ export default function UserProfile() {
               callback={update}
             />
           </div>
-        </CardBody>
+        </CardContent>
       </Card>
     </div>
   );

@@ -11,7 +11,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { useRouter } from "next/navigation";
-import { Button } from "@nextui-org/react";
+
 export default function Sidebar() {
   const router = useRouter();
   return (

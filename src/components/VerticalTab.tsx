@@ -1,5 +1,5 @@
 // types.ts
-import { Button, Listbox, ListboxItem } from "@nextui-org/react";
+
 import React, { Key, useState } from "react";
 export interface Tab {
   key: string;
@@ -20,30 +20,27 @@ export default function VerticalTabs({
 
   return (
     <div className="flex flex-col">
-      <Listbox
-        onAction={(key) => {
-          console.log("key:", key);
-          setActiveTab(key.toString());
-          callback(key.toString());
-        }}
-        aria-label="Vertical Tabs"
-      >
-        {tabs.map((tab) => (
-          <ListboxItem
-            key={tab.key}
-            aria-label={tab.title}
-            startContent={
-              <div
-                className={
-                  "w-[2px] h-5" + (activeTab == tab.key && " bg-blue-500")
-                }
-              />
-            }
-          >
-            {tab.title}
-          </ListboxItem>
-        ))}
-      </Listbox>
+      \
+      {tabs.map((tab) => (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          key={tab.key}
+          aria-label={tab.title}
+          onClick={() => {
+            setActiveTab(tab.key);
+            callback(tab.key);
+          }}
+        >
+          {activeTab == tab.key && (
+            <div
+              className={
+                "w-[2px] h-5" + (activeTab == tab.key && " bg-blue-500")
+              }
+            />
+          )}
+          {tab.title}
+        </div>
+      ))}
     </div>
   );
 }

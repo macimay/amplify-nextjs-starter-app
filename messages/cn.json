@@ -4,7 +4,7 @@
   },
   "Navigation": {
     "workspace": "工作区",
-    "marketplace": "ai场景库",
+    "marketplace": "ai超市",
     "practice": "练手区",
     "documents": "文档",
     "signOut": "退出账号",
@@ -45,7 +45,11 @@
     "menuPrice": "价格",
     "memberInviteTitle": "你可以邀请您的同事和您一起创作",
     "memberInvite": "邀请成员",
-    "teamProperty": "团队资产"
+    "teamProperty": "订阅",
+    "buyMore": "购买更多",
+    "tabIndex": "概览",
+    "tabMember": "成员",
+    "tabSetting": "设置"
   },
   "Loading": {
     "WelcomeFreshNew": "谢谢您选择WeDraw,为了方便您尽快使用，请稍等片刻",
@@ -63,7 +67,9 @@
     "inviteInputPrompt": "请输入邀请码",
     "TeamTitle": "置一个有创意的团队名字，开始工作",
     "TeamInputPrompt": "请输入团队名称",
-    "InitializeUserSession": "正在初始化用户会话..."
+    "InitializeUserSession": "正在初始化用户会话...",
+    "TeamCreate": "创建团队",
+    "TeamJoin": "加入团队"
   },
 
   "ProfilePage": {
@@ -82,5 +88,9 @@
     "LabelTeamAlias": "团队别名",
     "LabelTeamRole": "团队角色",
     "LabelTeamTitle": "团队名称"
+  },
+  "MarketPlace": {
+    "ProductEntryDetail": "产品详情",
+    "ProductEntryTips": "样例"
   }
 }
