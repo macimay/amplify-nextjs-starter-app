@@ -33,10 +33,11 @@ export default function DashboardLoading() {
 
       setLoadingPrompt(t("InitializeUserSession"));
       const session = await initializeUserSession();
-      setSession(session?.session);
-      console.log("session:", session?.session);
 
-      if (session?.session?.relation?.team) {
+      setSession(JSON.parse(session.session));
+      console.log("session:", session.session);
+
+      if (session.teamMember?.team) {
         //we got a team,so just switch to workspace
         //check if there is a team
         //use is not fresh,but not join/create any team

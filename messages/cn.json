@@ -1,4 +1,7 @@
 {
+  "Base": {
+    "saveButton": "保存"
+  },
   "Index": {
     "title": "你好世界"
   },
@@ -49,7 +52,12 @@
     "buyMore": "购买更多",
     "tabIndex": "概览",
     "tabMember": "成员",
-    "tabSetting": "设置"
+    "tabSetting": "设置",
+    "memberAlias": "成员别名",
+    "notSet": "未设置",
+    "memberRole": "成员角色",
+    "memberStatus": "成员状态",
+    "editMemberInfo": "编辑成员信息"
   },
   "Loading": {
     "WelcomeFreshNew": "谢谢您选择WeDraw,为了方便您尽快使用，请稍等片刻",

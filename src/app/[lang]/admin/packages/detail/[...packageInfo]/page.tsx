@@ -94,7 +94,7 @@ export default function DetailPage({
                       unit: values.unit,
                       description: values.description,
 
-                      productPackagesId: values.productId,
+                      productId: values.productId,
 
                       region: values.region,
                       isExpire: values.expireInfo.isExpire,
@@ -117,7 +117,7 @@ export default function DetailPage({
                       unit: values.unit,
                       description: values.description,
 
-                      productPackagesId: values.productId,
+                      productId: values.productId,
 
                       region: values.region,
                       isExpire: values.expireInfo.isExpire,

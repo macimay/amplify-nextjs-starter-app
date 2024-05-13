@@ -52,7 +52,7 @@ export default function DashboardLayout({
       <Authenticator>
         {({ signOut, user }) => {
           //get team info from user
-          if (session?.relation?.team == null) {
+          if (session?.teamMember?.team == null) {
             return <DashboardLoading />;
           } else
             return (

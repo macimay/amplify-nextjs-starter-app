@@ -20,6 +20,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Separator } from "@radix-ui/react-select";
+import { LoadingButton } from "./ui/loadingButton";
 
 export default function WelcomeComponent() {
   const [stage, setState] = useState("Welcome");
@@ -28,6 +29,8 @@ export default function WelcomeComponent() {
 
   const [teamName, setTeamName] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+  const [createStatus, setCreateStatus] = useState(false);
+  const [joinStatus, setJoinStatus] = useState(false);
 
   const { setSession } = useTeamContext();
 
@@ -52,6 +55,7 @@ export default function WelcomeComponent() {
   const handleCreateTeam = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setCreateStatus(true);
     const sessionInfo = await createTeam({ teamName: teamName });
     console.log("createUserAndTeam result: ", sessionInfo);
 
@@ -59,6 +63,7 @@ export default function WelcomeComponent() {
     //update usersession
 
     setSession(sessionInfo);
+    setCreateStatus(false);
     router.push("/dashboard/team");
   };
 
@@ -75,7 +80,7 @@ export default function WelcomeComponent() {
                       console.log("selectedTeam: ", selectedTeam);
                       const { userId } = await getCurrentUser();
                       updateSession({
-                        teamId: selectedTeam.id,
+                        teamId: selectedTeam,
                         userId: userId,
                       })
                         .then((sessionInfo) => {
@@ -103,7 +108,9 @@ export default function WelcomeComponent() {
                     </div>
                   </CardContent>
                   <CardFooter className="justify-center gap-4">
-                    <Button type="submit">{t("TeamCreate")}</Button>
+                    <LoadingButton type="submit" loading={createStatus}>
+                      {t("TeamCreate")}
+                    </LoadingButton>
                   </CardFooter>
                 </Card>
               </div>
@@ -126,7 +133,9 @@ export default function WelcomeComponent() {
                     />
                   </CardContent>
                   <CardFooter className="justify-center gap-4">
-                    <Button type="submit">{t("TeamJoin")}</Button>
+                    <LoadingButton type="submit" loading={joinStatus}>
+                      {t("TeamJoin")}
+                    </LoadingButton>
                   </CardFooter>
                 </Card>
               </form>

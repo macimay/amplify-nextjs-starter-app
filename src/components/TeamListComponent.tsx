@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { loginStatus } from "./LoginStatus";
 import { SelectionSet, generateClient } from "aws-amplify/api";
-import { Schema } from "../../amplify/data/resource";
+import { Schema } from "@/../amplify/data/resource";
 
 import { useTeamContext } from "./TeamContext";
 import {
@@ -17,7 +17,8 @@ export default function TeamListComponent({
 }: {
   callback: (team: any) => void;
 }) {
-  const selectionSet = ["team.*", "team.admin.*"] as const;
+  console.log("team list component");
+  const selectionSet = ["userId", "team.id", "team.name"] as const;
   type TeamListPackage = SelectionSet<
     Schema["TeamMember"],
     typeof selectionSet
@@ -34,9 +35,11 @@ export default function TeamListComponent({
       authMode: "apiKey",
     });
 
-    console.log("TeamListComponent:userId", session.relation?.user.id);
+    console.log("TeamListComponent:userId", session.userId);
     client.models.TeamMember.list({
-      filter: { teamMemberUserId: { eq: session.relation?.user.id } },
+      filter: {
+        userId: { eq: session.userId },
+      },
       selectionSet: selectionSet,
     }).then((teams) => {
       console.log("teams:", teams);

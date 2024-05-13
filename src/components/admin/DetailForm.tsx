@@ -50,6 +50,8 @@ import UnitedValueFormField from "./UnitedValueFormField";
 import FileFormField from "./FileFormField";
 import SwitchFormField from "./SwitchFormField";
 import { Description } from "@radix-ui/react-dialog";
+import { LoadingButton } from "../ui/loadingButton";
+import { useTranslations } from "next-intl";
 
 export default function DetailForm({
   data,
@@ -66,10 +68,8 @@ export default function DetailForm({
     data[event.target.name as keyof IBaseData] = event.target.value;
   };
   const formData = data.formData();
-  console.log("DetailForm formData:", formData);
 
   const items = data.formStructure();
-  console.log("DetailForm items:", items);
 
   const form = useForm<z.infer<typeof formData>>({
     resolver: zodResolver(formData),
@@ -78,10 +78,14 @@ export default function DetailForm({
   function onSubmit(values: z.infer<typeof formData>) {
     console.log("onSubmit:", values);
     // submit(values);
+    setLoading(true);
     onSubmitCallback(values);
+    setLoading(false);
   }
   const fileRef = form.register("file");
   console.log("DetailForm data:", data);
+  const t = useTranslations("Base");
+  const [loading, setLoading] = useState(false);
 
   return (
     <Form {...form}>
@@ -167,7 +171,9 @@ export default function DetailForm({
           } else {
           }
         })}
-        <Button type="submit">Submit</Button>
+        <LoadingButton type="submit" loading={loading}>
+          {t("saveButton")}
+        </LoadingButton>
       </form>
     </Form>
   );

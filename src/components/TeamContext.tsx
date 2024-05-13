@@ -9,10 +9,9 @@ const TeamContext = createContext<any>(undefined);
 
 export function TeamWrapper({ children }: { children: React.ReactNode }) {
   const selectionSet = [
-    "userId",
-    "relation.user.*",
-    "relation.team.*",
-    "relation.team.subscriptions.*",
+    "teamMember.user.*",
+    "teamMember.role",
+    "teamMember.team.*",
   ] as const;
   type SessionWithPackage = SelectionSet<
     Schema["UserSession"],
@@ -20,6 +19,9 @@ export function TeamWrapper({ children }: { children: React.ReactNode }) {
   >;
   let [session, setSession] = useState<SessionWithPackage>();
   let [region, setRegion] = useState<string>("CN");
+  let [team, setTeam] = useState<any>();
+  let [user, setUser] = useState<any>();
+  let isAdmin = false;
 
   useEffect(() => {
     console.log("TeamWrapper useEffect called");
@@ -52,10 +54,26 @@ export function TeamWrapper({ children }: { children: React.ReactNode }) {
     });
   }, []);
   useEffect(() => {
+    console.log("TeamWrapper useEffect called", session);
+    if (session?.teamMember.role === "ADMIN") {
+      isAdmin = true;
+    }
     loginStatus.update(JSON.stringify(session));
   }, [session]);
   return (
-    <TeamContext.Provider value={{ session, setSession, region, setRegion }}>
+    <TeamContext.Provider
+      value={{
+        session,
+        setSession,
+        region,
+        setRegion,
+        team,
+        setTeam,
+        user,
+        setUser,
+        isAdmin,
+      }}
+    >
       {children}
     </TeamContext.Provider>
   );

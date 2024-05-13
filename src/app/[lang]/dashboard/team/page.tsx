@@ -42,7 +42,7 @@ export default function TeamMembersPage() {
     "capacity",
     "package.*",
     "package.product.*",
-    "subscription.*",
+    "subscriptionId",
   ] as const;
   type TeamSubscriptionDataType = SelectionSet<
     Schema["SubscriptionPool"],
@@ -52,7 +52,7 @@ export default function TeamMembersPage() {
 
   console.log(loginStatus);
 
-  const [code, setCode] = useState("xxx");
+  const [code, setCode] = useState("XXXXXX");
   const [refreshCode, setRefresh] = useState(0);
   const [subscriptions, setSubscriptions] = useState<
     TeamSubscriptionDataType[]
@@ -61,9 +61,9 @@ export default function TeamMembersPage() {
   const { session } = useTeamContext();
 
   useEffect(() => {
-    console.log("load invite code:", session.relation.team.id);
+    console.log("load invite code:", session.teamMember?.team.id);
 
-    requestInviteCode(session.relation.team.id, false)
+    requestInviteCode(session.teamMember?.team.id, false)
       .then((code) => {
         console.log("code:", code);
         if (code) setCode(code.code); // Fix: Access the code property of the first element in the array
@@ -73,7 +73,7 @@ export default function TeamMembersPage() {
       });
   }, [session]);
   useEffect(() => {
-    requestInviteCode(session.relation.team.id, false)
+    requestInviteCode(session.teamMember?.team.id, false)
       .then((code) => {
         console.log("code:", code);
         if (code) setCode(code?.code); // Fix: Access the code property of the first element in the array
@@ -84,11 +84,12 @@ export default function TeamMembersPage() {
     const client = generateClient<Schema>({
       authMode: "apiKey",
     });
+
     client.models.SubscriptionPool.list({
       filter: {
-        teamSubscriptionsId: { eq: session.relation.team.id },
+        teamId: { eq: session.teamMember?.team.id },
       },
-      selectionSet: teamSubscriptionSelectionSet,
+      teamSubscriptionSelectionSet,
     }).then((data) => {
       console.log("team subscriptions:", data.data);
       setSubscriptions(data.data);

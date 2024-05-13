@@ -41,50 +41,62 @@ export async function initializeUserSession() {
     if (newUser) {
       //create session
       const session = await cookieBasedClient.models.UserSession.create({
-        userId: user.id!,
+        user: newUser,
         createAt: new Date().toISOString(),
         updateAt: new Date().toISOString(),
         ip: "",
       });
+      return { session: JSON.stringify(session.data) };
     }
   } else {
-    //create session
+    //use exist ,check session
     console.log("user exsit,get session:", user);
     let sessionData = await getSession(user.id!);
+    console.log("sessionData:", sessionData);
 
-    if (sessionData == null) {
+    if (sessionData === null) {
+      //no session recored,create new one
+      console.log("create session for user:", user.id);
       const session = await cookieBasedClient.models.UserSession.create({
         userId: user.id!,
         createAt: new Date().toISOString(),
         updateAt: new Date().toISOString(),
         ip: "",
       });
-      sessionData = await getSession(user.id!);
+      sessionData = session.data;
     }
 
-    return { session: sessionData };
+    return { session: JSON.stringify(sessionData) };
   }
 }
 async function getSession(userId: string) {
   const { data: sessionData, errors: sessionError } =
     await cookieBasedClient.models.UserSession.get(
-      { userId: userId! },
+      { userId: userId },
       {
         selectionSet: [
           "userId",
+          "teamMember.*",
+          "teamMember.role",
+          "teamMember.team.*",
           "createAt",
-          "relation.*",
-          "relation.team.*",
-          "relation.user.*",
           "updateAt",
-          "ip",
         ],
       }
     );
   if (sessionError) {
-    console.log("get session error:", sessionError);
+    console.log(
+      "error get session by user:",
+      userId,
+      " error is:",
+      sessionError
+    );
     return null;
   }
+  if (!sessionData || sessionData.hasOwnProperty("userId") == false) {
+    return null;
+  }
+
   return sessionData;
 }
 export async function updateSession({
@@ -94,30 +106,27 @@ export async function updateSession({
   teamId: string;
   userId: string;
 }) {
+  console.log("update session:", teamId, userId);
   const { data: teamMember, errors: teamMemberError } =
     await cookieBasedClient.models.TeamMember.list({
       filter: {
-        and: [
-          { teamMemberTeamId: { eq: teamId } },
-          { teamMemberUserId: { eq: userId } },
-        ],
+        and: [{ teamId: { eq: teamId } }, { userId: { eq: userId } }],
       },
     });
   if (teamMemberError || teamMember.length === 0) {
     console.log("team member error:", teamMemberError);
     throw { error: "TeamMemberError", message: teamMemberError };
   }
-  console.log("team member:", teamMember);
+
   const { data: session, errors: sessionError } =
     await cookieBasedClient.models.UserSession.update({
       userId: userId,
-      userSessionRelationId: teamMember[0].id,
+      teamMember: teamMember[0],
       updateAt: new Date().toISOString(),
     });
   if (sessionError) {
     console.log("update session error:", sessionError);
     throw { error: "UpdateSessionError", message: sessionError };
   }
-
-  return getSession(userId);
+  return JSON.stringify(session);
 }

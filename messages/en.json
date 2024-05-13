@@ -1,4 +1,7 @@
 {
+  "Base": {
+    "saveButton": "Save"
+  },
   "Index": {
     "title": "Hello world!"
   },
@@ -51,7 +54,12 @@
     "buyMore": "Buy More",
     "tabIndex": "Index",
     "tabMember": "Members",
-    "tabSetting": "Settings"
+    "tabSetting": "Settings",
+    "memberAlias": "Nickname",
+    "memberRole": "Role",
+    "notSet": "Not Set",
+    "memberStatus": "Status",
+    "editMemberInfo": "Edit Info"
   },
   "Loading": {
     "WelcomeFreshNew": "Thanks for choosing us,please Wait a moment, we are loading the freshest and newest content for you.",

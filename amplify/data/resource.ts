@@ -1,5 +1,6 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { profile } from "console";
+import { subscribe } from "diagnostics_channel";
 import { getPriority } from "os";
 
 /*== STEP 1 ===============================================================
@@ -28,93 +29,113 @@ const schema = a.schema({
       email: a.email(),
       phone: a.phone(),
       status: a.ref("Status").required(),
+      teamMember: a.hasMany("TeamMember", "userId"),
     })
-    .authorization([
-      a.allow.public().to(["read", "create", "delete", "update"]),
-    ]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   Team: a
     .model({
       name: a.string().required(),
       icon: a.string(),
-      admin: a.hasOne("User").required(),
+      adminId: a.id().required(),
       level: a.integer().default(0).required(),
       region: a.ref("SubscriptionRegion").required(),
-
-      subscriptions: a.hasMany("SubscriptionPool"),
+      inviteCode: a.hasOne("InviteCode", "teamId"),
+      members: a.hasMany("TeamMember", "teamId"),
+      pool: a.hasMany("SubscriptionPool", "teamId"),
+      subscriptions: a.hasMany("TeamSubscriptions", "teamId"),
     })
-    .authorization([
-      a.allow.public().to(["read", "create", "delete", "update"]),
-    ]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   TeamMember: a
     .model({
-      team: a.hasOne("Team").required(),
-      user: a.hasOne("User").required(),
+      teamId: a.id().required(),
+      team: a.belongsTo("Team", "teamId"),
+      userId: a.id().required(),
+      user: a.belongsTo("User", "userId"),
       alias: a.string(),
       title: a.string(),
       role: a.ref("UserRole").required(),
       joinAt: a.datetime().required(),
-      status: a.ref("Status").required(),
+      status: a.ref("Status"),
+      session: a.belongsTo("UserSession", "id"),
     })
-    .authorization([
-      a.allow.public().to(["read", "create", "delete", "update"]),
-    ]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   InviteCode: a
     .model({
+      teamId: a.id().required(),
+      team: a.belongsTo("Team", "teamId"),
       code: a.string().required(),
-      team: a.hasOne("Team").required(),
+
       used: a.boolean().default(false),
       createAt: a.datetime().required(),
       expiredAt: a.datetime(),
     })
-    .authorization([
-      a.allow.public().to(["read", "create", "delete", "update"]),
-    ]),
+    .identifier(["teamId"])
+    .secondaryIndexes((index) => [index("code").queryField("listInviteCode")])
+    .authorization((allow) => [allow.publicApiKey()]),
 
   UserSession: a
     .model({
       userId: a.id().required(),
-      relation: a.hasOne("TeamMember"),
+      teamMemberId: a.id(),
+      teamMember: a.hasOne("TeamMember", "id"),
       createAt: a.datetime().required(),
       updateAt: a.datetime().required(),
 
       ip: a.string().required(),
     })
     .identifier(["userId"])
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
-
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
   Product: a
     .model({
       name: a.string().required(),
       shortName: a.string().required(),
       icon: a.string().required(),
-      description: a.hasMany("ProductDescription"),
+      description: a.hasMany("ProductDescription", "productId"),
       publish: a.boolean().default(true).required(),
-      packages: a.hasMany("ProductPackage"),
+      packages: a.hasMany("ProductPackage", "productId"),
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   ProductDescription: a
     .model({
+      productId: a.id().required(),
+      product: a.belongsTo("Product", "productId"),
       imageKey: a.string(),
+
       description: a.string(),
       publish: a.boolean().default(false).required(),
       order: a.integer().required(),
       region: a.ref("SubscriptionRegion").required(),
       createdAt: a.datetime(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   SubscriptionPool: a
     .model({
-      team: a.belongsTo("Team"),
-      subscription: a.hasOne("Subscriptions").required(),
-      package: a.hasOne("ProductPackage").required(),
-      history: a.hasMany("subscriptionPoolHistory"),
+      teamId: a.id(),
+      team: a.belongsTo("Team", "teamId"),
+
+      subscriptionId: a.id().required(),
+
+      packageId: a.id().required(),
+      package: a.belongsTo("ProductPackage", "packageId"),
 
       used: a.integer().required(),
       periodicStart: a.datetime().required(),
@@ -126,23 +147,30 @@ const schema = a.schema({
       expireAt: a.datetime(),
       updateAt: a.datetime(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .secondaryIndexes((index) => [index("teamId"), index("subscriptionId")])
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   subscriptionPoolHistory: a
     .model({
       teamId: a.string().required(),
+
       packageId: a.string().required(),
       used: a.integer().required(),
       periodicStart: a.datetime(),
       periodicEnd: a.datetime(),
       capacity: a.integer().required(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   Subscriptions: a
     .model({
       name: a.string().required(),
-      packages: a.hasMany("ProductPackage"),
+
+      packages: a.hasMany("ProductPackage", "subscriptionId"),
 
       price: a.float().required(),
       currency: a.ref("PriceCurrency").required(),
@@ -162,25 +190,30 @@ const schema = a.schema({
       expireInDays: a.integer(),
       publish: a.boolean().default(true).required(),
     })
-    .authorization([
-      a.allow.public().to(["read", "create", "update", "delete"]),
-    ]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   TeamSubscriptions: a
     .model({
-      team: a.hasOne("Team"),
-      subscription: a.hasOne("Subscriptions"),
+      teamId: a.id().required(),
+      team: a.belongsTo("Team", "teamId"),
+      subscriptionId: a.id().required(),
       availableAt: a.datetime().required(),
       expireAt: a.datetime().required(),
       priority: a.integer().required(),
     })
-    .authorization([
-      a.allow.public().to(["read", "create", "update", "delete"]),
-    ]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   ProductPackage: a
     .model({
-      product: a.belongsTo("Product"),
+      productId: a.id().required(),
+      product: a.belongsTo("Product", "productId"),
+      subscriptionId: a.id(),
+      subscription: a.belongsTo("Subscriptions", "subscriptionId"),
+      packages: a.hasMany("SubscriptionPool", "packageId"),
       name: a.string().required(),
       count: a.integer().required(),
       unit: a.ref("PackageUnit").required(),
@@ -195,41 +228,24 @@ const schema = a.schema({
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
     })
-    .authorization([
-      a.allow.public().to(["read", "create", "update", "delete"]),
-    ]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 
   SubscriptionOrder: a
     .model({
-      id: a.id(),
-      team: a.hasOne("Team"),
-      subscriptions: a.hasOne("Subscriptions"),
+      teamId: a.id().required(),
+
+      subscriptionId: a.id().required(),
       price: a.float().required(),
       currency: a.ref("PriceCurrency").required(),
       count: a.integer().required(),
       amount: a.float().required(),
       createAt: a.datetime().required(),
     })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
-
-  Document: a
-    .model({
-      title: a.string().required(),
-      type: a.string().required(),
-      tags: a.hasMany("DocumentTag"),
-      content: a.string().required(),
-      createdAt: a.datetime().required(),
-      updatedAt: a.datetime().required(),
-      language: a.string().required(),
-    })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
-
-  DocumentTag: a
-    .model({
-      name: a.string().required(),
-      type: a.string().required(),
-    })
-    .authorization([a.allow.public().to(["read", "create", "update"])]),
+    .authorization((allow) =>
+      allow.publicApiKey().to(["read", "create", "delete", "update"])
+    ),
 });
 
 export type Schema = ClientSchema<typeof schema>;

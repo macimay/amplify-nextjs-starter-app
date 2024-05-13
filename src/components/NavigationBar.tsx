@@ -112,7 +112,7 @@ export default function NavigationBar() {
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link href="/dashboard/marketplace" color="primary">
+                  <Link href="/dashboard/marketplace" legacyBehavior passHref>
                     <NavigationMenuLink
                       className={navigationMenuTriggerStyle()}
                     >
@@ -122,17 +122,17 @@ export default function NavigationBar() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <Link href="/dashboard/practice">
+                  <Link href="/dashboard/practice" legacyBehavior passHref>
                     <NavigationMenuLink>{t("practice")}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link href="/dashboard/document">
+                  <Link href="/dashboard/document" legacyBehavior passHref>
                     <NavigationMenuLink>{t("documents")}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link href="/dashboard/team">
+                  <Link href="/dashboard/team" legacyBehavior passHref>
                     <NavigationMenuLink>{t("teamInfo")}</NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
@@ -148,7 +148,7 @@ export default function NavigationBar() {
                       width={16}
                       alt="avatar"
                     />
-                    <p>{session.relation.team?.name}</p>
+                    <p>{session.teamMember.team?.name}</p>
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -197,28 +197,3 @@ export default function NavigationBar() {
     </Authenticator>
   );
 }
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";

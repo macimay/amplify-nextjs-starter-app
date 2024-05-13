@@ -16,6 +16,12 @@ export const PeriodicArray = ["DAY", "WEEK", "MONTH", "YEAR"] as const;
 
 export type UnitType = "TIMES" | "SECOND";
 export const UnitArray = ["TIMES", "SECOND"] as const;
+export const MemberStatusArray = [
+  "ACTIVE",
+  "PENDING",
+  "SUSPEND",
+  "CLOSED",
+] as const;
 export interface IBaseData {
   id: string;
   [key: string]: any;

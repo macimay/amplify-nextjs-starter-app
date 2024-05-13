@@ -20,16 +20,17 @@ class LoginStatus {
   }
   public save() {
     console.log("Save loginStatus:", this);
-    localStorage.setItem("loginSession", JSON.stringify(this));
+    localStorage.setItem("loginSession", this.sessionInfo);
   }
 
   public load() {
     const loginSession = localStorage.getItem("loginSession");
-    if (loginSession) {
+    if (loginSession != undefined && loginSession != null) {
       console.log("Load loginStatus:", loginSession);
-      const loginStatus = JSON.parse(loginSession);
 
-      this.sessionInfo = loginStatus.sessionInfo;
+      this.sessionInfo = loginSession;
+    } else {
+      console.log("Load loginStatus: no data");
     }
   }
 

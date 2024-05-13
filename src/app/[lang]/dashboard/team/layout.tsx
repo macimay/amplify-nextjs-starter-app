@@ -10,7 +10,7 @@ export default function TeamLayout({
   const t = useTranslations("Team");
   return (
     <div className="flex flex-col w-full h-full">
-      <div id="tabs" className="flex flex-row w-2/3 justify-between">
+      <div id="tabs" className="flex flex-row w-1/5 justify-between">
         <Link href="/dashboard/team">{t("tabIndex")}</Link>
         <Link href="/dashboard/team/members">{t("tabMember")}</Link>
         <Link href="/dashboard/team/settings">{t("tabSetting")}</Link>

@@ -90,7 +90,7 @@ export default function ProductDescriptionPage({
                   imageKey: imageKey,
                   publish: values.publish,
                   region: values.region,
-                  productDescriptionId: params.info[0],
+                  productId: params.info[0],
                   order: 0,
                 }).then((result) => {
                   console.log("result:", result);

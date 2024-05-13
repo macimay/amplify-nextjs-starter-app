@@ -28,7 +28,8 @@ export default function SwitchFormField({
       render={({ field }) => (
         <FormItem>
           <FormLabel htmlFor={item.key}>{item.name}</FormLabel>
-          <FormControl>
+
+          <FormControl className="flex flex-row">
             <Switch checked={field.value} onCheckedChange={field.onChange} />
           </FormControl>
           <FormDescription>{item.description}</FormDescription>

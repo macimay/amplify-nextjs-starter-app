@@ -42,7 +42,7 @@ export async function createTeam({ teamName }: { teamName: string }) {
   const { data: team, errors: error } =
     await cookieBasedClient.models.Team.create({
       name: teamName,
-      teamAdminId: userBrief.sub!,
+      adminId: userBrief.sub!,
       level: 0,
       region: "CN",
     });
@@ -52,11 +52,11 @@ export async function createTeam({ teamName }: { teamName: string }) {
       message: `Team create failed: ${JSON.stringify(error)}`,
     };
   }
-
+  console.log("team created: ", team);
   const { data: teamMember, errors: inviteError } =
     await cookieBasedClient.models.TeamMember.create({
-      teamMemberTeamId: team.id!,
-      teamMemberUserId: userBrief.sub!,
+      team: team,
+      userId: userBrief.sub!,
       role: "ADMIN",
       joinAt: new Date().toISOString(),
       status: "ACTIVE",
@@ -67,11 +67,11 @@ export async function createTeam({ teamName }: { teamName: string }) {
   const { data: session, errors: sessionError } =
     await cookieBasedClient.models.UserSession.update({
       userId: userBrief.sub!,
-      userSessionRelationId: teamMember.id,
+      teamMember: teamMember,
       updateAt: new Date().toISOString(),
     });
 
-  console.log("session update: ", session);
+  // console.log("session update: ", session);
   return JSON.stringify(session);
 }
 /**
@@ -85,14 +85,12 @@ export async function joinTeamByInvite({ inviteCode }: { inviteCode: string }) {
     operation: (contextSpec) => fetchUserAttributes(contextSpec),
   });
 
-  const { data: invites, errors: codeGetError } =
+  const { data: invite, errors: codeGetError } =
     await cookieBasedClient.models.InviteCode.list({
       filter: {
-        code: {
-          eq: inviteCode,
-        },
+        code: { eq: inviteCode },
       },
-      selectionSet: ["team.id", "team.name"],
+      selectionSet: ["team.*", "teamId"],
     });
   if (codeGetError) {
     //can' find invite code
@@ -102,23 +100,18 @@ export async function joinTeamByInvite({ inviteCode }: { inviteCode: string }) {
     };
   }
 
-  console.log("invites: ", invites);
-  if (invites.length == 0) {
-    throw { error: TeamError.ErrorNoInviteCode, message: "ErrorNoInviteCode" };
-  }
-  const invite = invites[0];
   console.log("invite: ", invite);
 
   const { data: teamMember, errors: inviteError } =
     await cookieBasedClient.models.TeamMember.create({
-      teamMemberTeamId: invite.team.id!,
-      teamMemberUserId: userBrief.sub!,
+      teamId: invite.teamId!,
+      userId: userBrief.sub!,
       role: "MEMBER",
       joinAt: new Date().toISOString(),
       status: "ACTIVE",
     });
 
-  return invite.team;
+  return getTeamInfo(invite.teamId!, userBrief.sub!);
 }
 async function checkTeamAvailable({
   name,
@@ -155,59 +148,63 @@ export async function requestInviteCode(teamId: string, refresh: boolean) {
     nextServerContext: { cookies },
     operation: (contextSpec) => fetchUserAttributes(contextSpec),
   });
-  if (refresh) {
-    console.log("refresh invite code");
-    const { data: inviteCode, errors: codeGetError } =
-      await cookieBasedClient.models.InviteCode.list({
-        filter: {
-          inviteCodeTeamId: { eq: teamId },
-        },
-        selectionSet: ["id"],
-      });
-    if (codeGetError) {
-      console.log("get invite code failed");
-    } else if (inviteCode.length > 0) {
-      await cookieBasedClient.models.InviteCode.delete({
-        id: inviteCode[0].id!,
-      });
-      const code = createInviteCode(teamId);
 
-      return { code: code };
-    } else {
-      const code = createInviteCode(teamId);
-      return { code: code };
-    }
-  } else {
-    //return old ones
-    const { data: inviteCode, errors: codeGetError } =
-      await cookieBasedClient.models.InviteCode.list({
-        filter: {
-          inviteCodeTeamId: { eq: teamId },
-        },
-        selectionSet: ["code"],
+  //check current code
+  const { data: inviteCode, errors: codeGetError } =
+    await cookieBasedClient.models.InviteCode.get(
+      {
+        teamId: teamId,
+      },
+      {
+        selectionSet: ["teamId", "code"],
+      }
+    );
+  if (codeGetError || inviteCode.code == null || inviteCode.code == "") {
+    const code = generateCode(6);
+    if (refresh) {
+      await cookieBasedClient.models.InviteCode.update({
+        teamId: inviteCode.teamId,
+        code: code,
       });
-    if (codeGetError) {
-      console.log("get invite code failed");
-      throw {
-        error: TeamError.GetInviteCodeFailed,
-        message: "Error getting invite code",
-      };
+    } else {
+      await cookieBasedClient.models.InviteCode.create({
+        teamId: teamId,
+        used: false,
+        code: code,
+        createAt: new Date().toISOString(),
+      });
     }
-    if (inviteCode.length == 0) {
-      console.log("no invite code founded,request a new one");
-      const code = createInviteCode(teamId);
-      return { code: code };
-    }
-    return { code: inviteCode[0].code! };
+    return { code: code };
+  } else {
+    return { code: inviteCode.code };
   }
 }
 function createInviteCode(teamId: string) {
   const code = generateCode(6);
   cookieBasedClient.models.InviteCode.create({
-    inviteCodeTeamId: teamId,
+    teamId: teamId,
     used: false,
     code: code,
     createAt: new Date().toISOString(),
   });
   return code;
+}
+async function getTeamInfo(teamId: string, userId: string) {
+  const { data: team, errors: teamError } =
+    await cookieBasedClient.models.Team.get({ id: teamId });
+  const { data: memberInfo, errors: memberError } =
+    await cookieBasedClient.models.TeamMember.list({
+      filter: {
+        and: [{ teamId: { eq: teamId } }, { userId: { eq: userId } }],
+      },
+    });
+  if (teamError) {
+    console.log("get team info failed:", teamError);
+    throw teamError;
+  }
+  if (memberError) {
+    console.log("get team member info failed:", memberError);
+    throw memberError;
+  }
+  return { team, memberInfo };
 }
